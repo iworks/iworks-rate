@@ -15,13 +15,13 @@
 if ( ! class_exists( 'iworks_rate' ) ) {
 	class iworks_rate {
 
-        /**
-         * $wpdb->options field name.
+		/**
+		 * $wpdb->options field name.
 		 *
 		 * @since 1.0.0
 		 * @var   string
-         */
-        protected $option_name = 'iworks_rate';
+		 */
+		protected $option_name = 'iworks_rate';
 
 		/**
 		 * List of all registered plugins.
@@ -122,7 +122,7 @@ if ( ! class_exists( 'iworks_rate' ) ) {
 		 * @param  string $cta_email Title of the Email CTA button.
 		 * @param  string $drip_plugin Optional. Plugin-param for the getdrip rule.
 		 */
-        public function iworks_register_plugin( $plugin_id, $title, $url_wp, $cta_email = '', $drip_plugin = '' ) {
+		public function iworks_register_plugin( $plugin_id, $title, $url_wp, $cta_email = '', $drip_plugin = '' ) {
 			// Ignore incorrectly registered plugins to avoid errors later.
 			if ( empty( $plugin_id ) ) { return; }
 			if ( empty( $title ) ) { return; }
@@ -132,7 +132,7 @@ if ( ! class_exists( 'iworks_rate' ) ) {
 				$url_wp = 'https://wordpress.org/' . trim( $url_wp, '/' );
 			}
 
-			$this->plugins[$plugin_id] = (object) array(
+			$this->plugins[ $plugin_id ] = (object) array(
 				'id' => $plugin_id,
 				'title' => $title,
 				'url_wp' => $url_wp,
@@ -145,20 +145,20 @@ if ( ! class_exists( 'iworks_rate' ) ) {
 			 * in the persistent module-data that help us later to find out
 			 * if/which message should be displayed.
 			 */
-			if ( empty( $this->stored['plugins'][$plugin_id] ) ) {
+			if ( empty( $this->stored['plugins'][ $plugin_id ] ) ) {
 				// First register the plugin permanently.
-				$this->stored['plugins'][$plugin_id] = time();
+				$this->stored['plugins'][ $plugin_id ] = time();
 
 				// Second schedule the messages to display.
 				$hash = md5( $plugin_id . '-email' );
-				$this->stored['queue'][$hash] = array(
+				$this->stored['queue'][ $hash ] = array(
 					'plugin' => $plugin_id,
 					'type' => 'email',
 					'show_at' => time(),  // Earliest time to display note.
 				);
 
 				$hash = md5( $plugin_id . '-rate' );
-				$this->stored['queue'][$hash] = array(
+				$this->stored['queue'][ $hash ] = array(
 					'plugin' => $plugin_id,
 					'type' => 'rate',
 					'show_at' => time() + 7 * DAY_IN_SECONDS,
@@ -249,9 +249,9 @@ if ( ! class_exists( 'iworks_rate' ) ) {
 				if ( ' ' == $custom_time[0] ) { $custom_time[0] = '+'; }
 				if ( $custom_time ) { $now = strtotime( $custom_time ); }
 				if ( ! $now ) { $now = time(); }
-            }
+			}
 
-            l($now);
+			l( $now );
 
 			$tomorrow = $now + DAY_IN_SECONDS;
 
@@ -299,21 +299,21 @@ if ( ! class_exists( 'iworks_rate' ) ) {
 
 			if ( $chosen ) {
 				// Make the chosen item sticky.
-				$this->stored['queue'][$chosen]['sticky'] = true;
+				$this->stored['queue'][ $chosen ]['sticky'] = true;
 
 				// Re-schedule other messages that are due today.
 				foreach ( $this->stored['queue'] as $hash => $item ) {
 					$show_at = intval( $item['show_at'] );
 
 					if ( empty( $item['sticky'] ) && $tomorrow > $show_at ) {
-						$this->stored['queue'][$hash]['show_at'] = $tomorrow;
+						$this->stored['queue'][ $hash ]['show_at'] = $tomorrow;
 					}
 				}
 
 				// Save the changes.
 				$this->store_data();
 
-				$obj = (object) $this->stored['queue'][$chosen];
+				$obj = (object) $this->stored['queue'][ $chosen ];
 			}
 
 			return $obj;
@@ -331,11 +331,11 @@ if ( ! class_exists( 'iworks_rate' ) ) {
 			$done_item = false;
 
 			foreach ( $this->stored['queue'] as $hash => $item ) {
-				unset( $this->stored['queue'][$hash]['sticky'] );
+				unset( $this->stored['queue'][ $hash ]['sticky'] );
 
 				if ( $item['plugin'] == $plugin && $item['type'] == $type ) {
 					$done_item = $item;
-					unset( $this->stored['queue'][$hash] );
+					unset( $this->stored['queue'][ $hash ] );
 				}
 			}
 
@@ -356,11 +356,11 @@ if ( ! class_exists( 'iworks_rate' ) ) {
 		 * @since  1.0.0
 		 */
 		protected function render_message( $info ) {
-			$plugin = $this->plugins[$info->plugin];
+			$plugin = $this->plugins[ $info->plugin ];
 			$css_url = plugin_dir_url( __FILE__ ) . '/admin.css';
 			$js_url = plugin_dir_url( __FILE__ ) . '/admin.js';
 
-            do_action( 'iworks_rate_css' );
+			do_action( 'iworks_rate_css' );
 			?>
 			<link rel="stylesheet" type="text/css" href="<?php echo esc_url( $css_url ); ?>" />
 			<div class="notice iworks-notice iworks-notice-<?php echo esc_attr( $info->type ); ?> iworks-notice-<?php echo esc_attr( dirname( $info->plugin ) ); ?>" style="display:none">
