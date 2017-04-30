@@ -1,12 +1,12 @@
 jQuery(function() {
-	var el_notice = jQuery( ".frash-notice" ),
+	var el_notice = jQuery( ".iworks-notice" ),
 		type = el_notice.find( "input[name=type]" ).val(),
 		plugin_id = el_notice.find( "input[name=plugin_id]" ).val(),
 		url_wp = el_notice.find( "input[name=url_wp]" ).val(),
 		drip_plugin = el_notice.find( "input[name=drip_plugin]" ).val(),
 		inp_email = el_notice.find( "input[name=email]" )
-		btn_act = el_notice.find( ".frash-notice-act" ),
-		btn_dismiss = el_notice.find( ".frash-notice-dismiss" )
+		btn_act = el_notice.find( ".iworks-notice-act" ),
+		btn_dismiss = el_notice.find( ".iworks-notice-dismiss" )
 		ajax_data = {};
 
 	ajax_data.plugin_id = plugin_id;
@@ -56,7 +56,7 @@ jQuery(function() {
 
 	// Open a tab to rate the plugin.
 	function act_rate() {
-		var url = url_wp.replace( /\/plugins\//, "/support/view/plugin-reviews/" ) + "?rate=5#postform",
+		var url = url_wp.replace( /\/plugins\//, "/support/view/plugin-reviews/" ) + "?rate=5#new-post",
 			link = jQuery( '<a href="' + url + '" target="_blank">Rate</a>' );
 
 		link.appendTo( "body" );
@@ -105,14 +105,14 @@ jQuery(function() {
 			case 'email': act_email(); break;
 		}
 
-		notify_wordpress( "frash_act", btn_act.data( "msg" ) );
+		notify_wordpress( "iworks_act", btn_act.data( "msg" ) );
 	});
 
 	// Dismiss the notice without any action.
 	btn_dismiss.click(function( ev ) {
 		ev.preventDefault();
 
-		notify_wordpress( "frash_dismiss", btn_dismiss.data( "msg" ) );
+		notify_wordpress( "iworks_dismiss", btn_dismiss.data( "msg" ) );
 	});
 
 	window.setTimeout( initialize, 500 );

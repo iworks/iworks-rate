@@ -1,4 +1,4 @@
-# WDEV Frash module #
+# iWorks Rate module #
 
 WPMU DEV Free Dashboard module (short wdev-frash) is used in our free plugins hosted on wordpress.org
 It will display a welcome message upon plugin activation that offers the user a 5-day introduction email course for the plugin. After 7 days the module will display another message asking the user to rate the plugin on wordpress.org
@@ -14,20 +14,20 @@ It will display a welcome message upon plugin activation that offers the user a 
 4. Done!
 
 
-## Code Example (from Membership 2) ##
+## Code Example (from Sierotki) ##
 
 ```
 #!php
 
 <?php
-// Load the WDev-Frash module.
-include_once 'lib/wdev-frash/module.php';
+// Load the iWorks-Rate module.
+include_once 'vendor/iworks/rate/rate.php';
 
 // Register the current plugin.
 do_action(
 	'wdev-register-plugin',
 	/* 1             Plugin ID */ plugin_basename( __FILE__ ),
-	/* 2          Plugin Title */ 'Membership 2',            
+	/* 2          Plugin Title */ 'Sierotki',            
 	/* 3 https://wordpress.org */ '/plugins/membership/',
 	/* 4      Email Button CTA */ __( 'Get Members!', MYD_TEXT_DOMAIN ),  
 	/* 5  getdrip Plugin param */ 'Membership'

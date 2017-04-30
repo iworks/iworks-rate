@@ -8,7 +8,7 @@
  *
  * Based on:
  *
- * WPMUDEV Frash - Free Dashboard Notification module.
+ * WPMUDEV iworks - Free Dashboard Notification module.
  * Used by wordpress.org hosted plugins.
  *
  */
@@ -68,8 +68,8 @@ if ( ! class_exists( 'iworks_rate' ) ) {
 			$this->add_action( 'iworks-register-plugin', 5 );
 			$this->add_action( 'load-index.php' );
 
-			$this->add_action( 'wp_ajax_frash_act' );
-			$this->add_action( 'wp_ajax_frash_dismiss' );
+			$this->add_action( 'wp_ajax_iworks_act' );
+			$this->add_action( 'wp_ajax_iworks_dismiss' );
 		}
 
 		/**
@@ -122,7 +122,7 @@ if ( ! class_exists( 'iworks_rate' ) ) {
 		 * @param  string $cta_email Title of the Email CTA button.
 		 * @param  string $drip_plugin Optional. Plugin-param for the getdrip rule.
 		 */
-		public function iworks_register_plugin( $plugin_id, $title, $url_wp, $cta_email = '', $drip_plugin = '' ) {
+        public function iworks_register_plugin( $plugin_id, $title, $url_wp, $cta_email = '', $drip_plugin = '' ) {
 			// Ignore incorrectly registered plugins to avoid errors later.
 			if ( empty( $plugin_id ) ) { return; }
 			if ( empty( $title ) ) { return; }
@@ -174,7 +174,7 @@ if ( ! class_exists( 'iworks_rate' ) ) {
 		 *
 		 * @since  1.0.0
 		 */
-		public function wp_ajax_frash_act() {
+		public function wp_ajax_iworks_act() {
 			$plugin = $_POST['plugin_id'];
 			$type = $_POST['type'];
 
@@ -189,7 +189,7 @@ if ( ! class_exists( 'iworks_rate' ) ) {
 		 *
 		 * @since  1.0.0
 		 */
-		public function wp_ajax_frash_dismiss() {
+		public function wp_ajax_iworks_dismiss() {
 			$plugin = $_POST['plugin_id'];
 			$type = $_POST['type'];
 
@@ -249,7 +249,9 @@ if ( ! class_exists( 'iworks_rate' ) ) {
 				if ( ' ' == $custom_time[0] ) { $custom_time[0] = '+'; }
 				if ( $custom_time ) { $now = strtotime( $custom_time ); }
 				if ( ! $now ) { $now = time(); }
-			}
+            }
+
+            l($now);
 
 			$tomorrow = $now + DAY_IN_SECONDS;
 
@@ -358,9 +360,10 @@ if ( ! class_exists( 'iworks_rate' ) ) {
 			$css_url = plugin_dir_url( __FILE__ ) . '/admin.css';
 			$js_url = plugin_dir_url( __FILE__ ) . '/admin.js';
 
+            do_action( 'iworks_rate_css' );
 			?>
 			<link rel="stylesheet" type="text/css" href="<?php echo esc_url( $css_url ); ?>" />
-			<div class="notice frash-notice frash-notice-<?php echo esc_attr( $info->type ); ?>" style="display:none">
+			<div class="notice iworks-notice iworks-notice-<?php echo esc_attr( $info->type ); ?> iworks-notice-<?php echo esc_attr( dirname( $info->plugin ) ); ?>" style="display:none">
 				<input type="hidden" name="type" value="<?php echo esc_attr( $info->type ); ?>" />
 				<input type="hidden" name="plugin_id" value="<?php echo esc_attr( $info->plugin ); ?>" />
 				<input type="hidden" name="url_wp" value="<?php echo esc_attr( $plugin->url_wp ); ?>" />
@@ -383,12 +386,12 @@ if ( ! class_exists( 'iworks_rate' ) ) {
 			$user = wp_get_current_user();
 			$user_name = $user->display_name;
 
-			$msg = __( "Hey %s, you've been using %s for a while now, and we hope you're happy with it.", 'iworks_frash' ) . '<br />'. __( "We've spent countless hours developing this free plugin for you, and we would really appreciate it if you dropped us a quick rating!", 'iworks_frash' );
+			$msg = __( "Hey %s, you've been using %s for a while now, and we hope you're happy with it.", 'iworks_rate' ) . '<br />'. __( "We've spent countless hours developing this free plugin for you, and we would really appreciate it if you dropped us a quick rating!", 'iworks_rate' );
 			$msg = apply_filters( 'iworks-rating-message-' . $plugin->id, $msg );
 
 			?>
-			<div class="frash-notice-logo"><span></span></div>
-				<div class="frash-notice-message">
+			<div class="iworks-notice-logo"><span></span></div>
+				<div class="iworks-notice-message">
 					<?php
 					printf(
 						$msg,
@@ -397,16 +400,16 @@ if ( ! class_exists( 'iworks_rate' ) ) {
 					);
 					?>
 				</div>
-				<div class="frash-notice-cta">
-					<button class="frash-notice-act button-primary" data-msg="<?php _e( 'Thanks :)', 'iworks_frash' ); ?>">
+				<div class="iworks-notice-cta">
+					<button class="iworks-notice-act button-primary" data-msg="<?php _e( 'Thanks :)', 'iworks_rate' ); ?>">
 						<?php
 						printf(
-							__( 'Rate %s', 'iworks_frash' ),
+							__( 'Rate %s', 'iworks_rate' ),
 							esc_html( $plugin->title )
 						); ?>
 					</button>
-					<button class="frash-notice-dismiss" data-msg="<?php _e( 'Saving', 'iworks_frash' ); ?>">
-						<?php _e( 'No thanks', 'iworks_frash' ); ?>
+					<button class="iworks-notice-dismiss" data-msg="<?php _e( 'Saving', 'iworks_rate' ); ?>">
+						<?php _e( 'No thanks', 'iworks_rate' ); ?>
 					</button>
 				</div>
 			<?php
@@ -423,7 +426,6 @@ if ( ! class_exists( 'iworks_rate' ) ) {
 			$method_name = preg_replace( '/[^a-z0-9]/', '_', $method_name );
 			$handler = array( $this, $method_name );
 			add_action( $hook, $handler, 5, $params );
-			l(array( $hook, $handler, 5, $params ));
 		}
 	}
 
