@@ -251,8 +251,6 @@ if ( ! class_exists( 'iworks_rate' ) ) {
 				if ( ! $now ) { $now = time(); }
 			}
 
-			l( $now );
-
 			$tomorrow = $now + DAY_IN_SECONDS;
 
 			foreach ( $this->stored['queue'] as $hash => $item ) {
