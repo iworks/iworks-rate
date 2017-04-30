@@ -386,7 +386,7 @@ if ( ! class_exists( 'iworks_rate' ) ) {
 			$user = wp_get_current_user();
 			$user_name = $user->display_name;
 
-			$msg = __( "Hey %s, you've been using %s for a while now, and we hope you're happy with it.", 'iworks_rate' ) . '<br />'. __( "We've spent countless hours developing this free plugin for you, and we would really appreciate it if you dropped us a quick rating!", 'iworks_rate' );
+			$msg = __( "Hey %s, you've been using %s for a while now, and we hope you're happy with it.", 'IWORKS_RATE_TEXTDOMAIN' ) . '<br />'. __( "We've spent countless hours developing this free plugin for you, and we would really appreciate it if you dropped us a quick rating!", 'IWORKS_RATE_TEXTDOMAIN' );
 			$msg = apply_filters( 'iworks-rating-message-' . $plugin->id, $msg );
 
 			?>
@@ -401,15 +401,15 @@ if ( ! class_exists( 'iworks_rate' ) ) {
 					?>
 				</div>
 				<div class="iworks-notice-cta">
-					<button class="iworks-notice-act button-primary" data-msg="<?php _e( 'Thanks :)', 'iworks_rate' ); ?>">
+					<button class="iworks-notice-act button-primary" data-msg="<?php _e( 'Thanks :)', 'IWORKS_RATE_TEXTDOMAIN' ); ?>">
 						<?php
 						printf(
-							__( 'Rate %s', 'iworks_rate' ),
+							__( 'Rate %s', 'IWORKS_RATE_TEXTDOMAIN' ),
 							esc_html( $plugin->title )
 						); ?>
 					</button>
-					<button class="iworks-notice-dismiss" data-msg="<?php _e( 'Saving', 'iworks_rate' ); ?>">
-						<?php _e( 'No thanks', 'iworks_rate' ); ?>
+					<button class="iworks-notice-dismiss" data-msg="<?php _e( 'Saving', 'IWORKS_RATE_TEXTDOMAIN' ); ?>">
+						<?php _e( 'No thanks', 'IWORKS_RATE_TEXTDOMAIN' ); ?>
 					</button>
 				</div>
 			<?php
