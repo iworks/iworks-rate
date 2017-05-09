@@ -1,48 +1,16 @@
 jQuery(function() {
 	var el_notice = jQuery( ".iworks-notice" ),
-		type = el_notice.find( "input[name=type]" ).val(),
 		plugin_id = el_notice.find( "input[name=plugin_id]" ).val(),
 		slug = el_notice.find( "input[name=slug]" ).val(),
-		drip_plugin = el_notice.find( "input[name=drip_plugin]" ).val(),
-		inp_email = el_notice.find( "input[name=email]" )
 		btn_act = el_notice.find( ".iworks-notice-act" ),
 		btn_dismiss = el_notice.find( ".iworks-notice-dismiss" )
 		ajax_data = {};
 
 	ajax_data.plugin_id = plugin_id;
-	ajax_data.type = type;
-
-	function init_email() {
-		if ( ! inp_email.length ) { return; }
-
-		// Adjust the size of the email field to its contents.
-		function adjust_email_size() {
-			var width, tmp = jQuery( "<span></span>" );
-
-			tmp.addClass( "input-field" ).text( inp_email.val() );
-			tmp.appendTo( "body" );
-			width = parseInt( tmp.width() );
-			tmp.remove();
-
-			inp_email.width( width + 34 );
-		}
-
-		function email_keycheck( ev ) {
-			if ( 13 === ev.keyCode ) {
-				btn_act.click();
-			} else {
-				adjust_email_size();
-			}
-		}
-
-		inp_email.keyup( email_keycheck ).focus().select();
-		adjust_email_size();
-	}
 
 	// Display the notice after the page was loaded.
 	function initialize() {
 		el_notice.fadeIn( 500 );
-		init_email();
 	}
 
 	// Hide the notice after a CTA button was clicked
@@ -52,34 +20,6 @@ jQuery(function() {
 				el_notice.remove();
 			});
 		});
-	}
-
-	// Open a tab to rate the plugin.
-	function act_rate() {
-		var url = 'https://wordpress.org/support/plugin/'+slug+'/reviews/?rate=5#new-post';
-        var link = jQuery( '<a href="' + url + '" target="_blank">Rate</a>' );
-
-		link.appendTo( "body" );
-		link[0].click();
-		link.remove();
-	}
-
-	// Submit the user to our email list.
-	function act_email() {
-		var email = inp_email.val();
-
-		// First create a new subscriber.
-		_dcq.push([
-			"identify",
-			{ email: email }
-		]);
-
-		// Then trigger the specified rule.
-		_dcq.push([
-			"track",
-			"Free plugin email course",
-			{"Plugin": drip_plugin}
-		]);
 	}
 
 	// Notify WordPress about the users choice and close the message.
@@ -99,12 +39,11 @@ jQuery(function() {
 	// Either open the wp.org page or submit the email address.
 	btn_act.click(function( ev ) {
 		ev.preventDefault();
-
-		switch ( type ) {
-			case 'rate': act_rate(); break;
-			case 'email': act_email(); break;
-		}
-
+		var url = 'https://wordpress.org/support/plugin/'+slug+'/reviews/?rate=5#new-post';
+        var link = jQuery( '<a href="' + url + '" target="_blank">Rate</a>' );
+		link.appendTo( "body" );
+		link[0].click();
+		link.remove();
 		notify_wordpress( "iworks_act", btn_act.data( "msg" ) );
 	});
 
@@ -118,14 +57,3 @@ jQuery(function() {
 	window.setTimeout( initialize, 500 );
 });
 
-// Drip integration
-var _dcq = _dcq || [];
-var _dcs = _dcs || {};
-
-_dcs.account = '6994213';
-var dc = document.createElement( 'script' );
-dc.type = 'text/javascript'; dc.async = true;
-dc.src = '//tag.getdrip.com/6994213.js';
-var s = document.getElementsByTagName('script')[0];
-s.parentNode.insertBefore(dc, s);
-// End of drip integration

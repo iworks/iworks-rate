@@ -2,7 +2,7 @@
 /**
  * iWorks_Rate - Dashboard Notification module.
  *
- * @version 1.0.0
+ * @version 1.0.1
  * @author  iworks (Marcin Pietrzak)
  * @author  Incsub (Philipp Stracker)
  *
@@ -14,6 +14,14 @@
  */
 if ( ! class_exists( 'iworks_rate' ) ) {
 	class iworks_rate {
+
+		/**
+		 * This class version.
+		 *
+		 * @since 1.0.1
+		 * @var   string
+		 */
+		private $version = '1.0.1';
 
 		/**
 		 * $wpdb->options field name.
@@ -141,18 +149,9 @@ if ( ! class_exists( 'iworks_rate' ) ) {
 				// First register the plugin permanently.
 				$this->stored['plugins'][ $plugin_id ] = time();
 
-				// Second schedule the messages to display.
-				$hash = md5( $plugin_id . '-email' );
-				$this->stored['queue'][ $hash ] = array(
-					'plugin' => $plugin_id,
-					'type' => 'email',
-					'show_at' => time(),  // Earliest time to display note.
-				);
-
 				$hash = md5( $plugin_id . '-rate' );
 				$this->stored['queue'][ $hash ] = array(
 					'plugin' => $plugin_id,
-					'type' => 'rate',
 					'show_at' => time() + 7 * DAY_IN_SECONDS,
 				);
 
@@ -168,12 +167,8 @@ if ( ! class_exists( 'iworks_rate' ) ) {
 		 */
 		public function wp_ajax_iworks_act() {
 			$plugin = $_POST['plugin_id'];
-			$type = $_POST['type'];
-
-			$this->mark_as_done( $plugin, $type, 'ok' );
-
-			echo 1;
-			exit;
+			$this->mark_as_done( $plugin, 'ok' );
+			wp_send_json_success();
 		}
 
 		/**
@@ -183,12 +178,8 @@ if ( ! class_exists( 'iworks_rate' ) ) {
 		 */
 		public function wp_ajax_iworks_dismiss() {
 			$plugin = $_POST['plugin_id'];
-			$type = $_POST['type'];
-
-			$this->mark_as_done( $plugin, $type, 'ignore' );
-
-			echo 1;
-			exit;
+			$this->mark_as_done( $plugin, 'ignore' );
+			wp_send_json_success();
 		}
 
 		/**
@@ -200,6 +191,19 @@ if ( ! class_exists( 'iworks_rate' ) ) {
 		public function load_index_php() {
 			if ( is_super_admin() ) {
 				$this->add_action( 'all_admin_notices' );
+				wp_enqueue_style(
+					__CLASS__,
+					plugin_dir_url( __FILE__ ) . 'admin.css',
+					array(),
+					$this->version
+				);
+				wp_enqueue_script(
+					__CLASS__,
+					plugin_dir_url( __FILE__ ) . 'admin.js',
+					array(),
+					$this->version,
+					true
+				);
 			}
 		}
 
@@ -225,7 +229,6 @@ if ( ! class_exists( 'iworks_rate' ) ) {
 		 *
 		 * @since  1.0.0
 		 * @return object|false
-		 *         string $type   [rate|email] Which message type?
 		 *         string $plugin WordPress plugin ID?
 		 */
 		protected function choose_message() {
@@ -257,16 +260,7 @@ if ( ! class_exists( 'iworks_rate' ) ) {
 
 				$can_display = true;
 				if ( wp_is_mobile() ) {
-					// Do not display rating message on mobile devices.
-					if ( 'rate' == $item['type'] ) {
-						$can_display = false;
-					}
-				}
-				if ( 'email' == $item['type'] ) {
-					if ( ! $plugin->drip_plugin || ! $plugin->cta_email ) {
-						// Do not display email message with missing email params.
-						$can_display = false;
-					}
+					$can_display = false;
 				}
 				if ( $now < $show_at ) {
 					// Do not display messages that are not due yet.
@@ -314,16 +308,15 @@ if ( ! class_exists( 'iworks_rate' ) ) {
 		 *
 		 * @since  1.0.0
 		 * @param  string $plugin Plugin ID.
-		 * @param  string $type [rate|email] Message type.
 		 * @param  string $state [ok|ignore] Button clicked.
 		 */
-		protected function mark_as_done( $plugin, $type, $state ) {
+		protected function mark_as_done( $plugin, $state ) {
 			$done_item = false;
 
 			foreach ( $this->stored['queue'] as $hash => $item ) {
 				unset( $this->stored['queue'][ $hash ]['sticky'] );
 
-				if ( $item['plugin'] == $plugin && $item['type'] == $type ) {
+				if ( $item['plugin'] == $plugin  ) {
 					$done_item = $item;
 					unset( $this->stored['queue'][ $hash ] );
 				}
@@ -347,20 +340,15 @@ if ( ! class_exists( 'iworks_rate' ) ) {
 		 */
 		protected function render_message( $info ) {
 			$plugin = $this->plugins[ $info->plugin ];
-			$css_url = plugin_dir_url( __FILE__ ) . 'admin.css';
-			$js_url = plugin_dir_url( __FILE__ ) . 'admin.js';
 			do_action( 'iworks_rate_css' );
 			?>
-			<link rel="stylesheet" type="text/css" href="<?php echo esc_url( $css_url ); ?>" />
-			<div class="notice iworks-notice iworks-notice-<?php echo esc_attr( $info->type ); ?> iworks-notice-<?php echo esc_attr( dirname( $info->plugin ) ); ?>" style="display:none">
-				<input type="hidden" name="type" value="<?php echo esc_attr( $info->type ); ?>" />
+			<div class="notice iworks-notice iworks-notice-rate iworks-notice-<?php echo esc_attr( dirname( $info->plugin ) ); ?>" style="display:none">
 				<input type="hidden" name="plugin_id" value="<?php echo esc_attr( $info->plugin ); ?>" />
-				<input type="hidden" name="slug" value="<?php echo esc_attr( $this->plugins[ $info->plugin ]->slug ); ?>" />
+				<input type="hidden" name="slug" value="<?php echo esc_attr( $plugin->slug ); ?>" />
 				<?php
 					$this->render_rate_message( $plugin );
 				?>
 			</div>
-			<script src="<?php echo esc_url( $js_url ); ?>"></script>
 			<?php
 		}
 
