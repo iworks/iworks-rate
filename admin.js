@@ -2,7 +2,7 @@ jQuery(function() {
 	var el_notice = jQuery( ".iworks-notice" ),
 		type = el_notice.find( "input[name=type]" ).val(),
 		plugin_id = el_notice.find( "input[name=plugin_id]" ).val(),
-		url_wp = el_notice.find( "input[name=url_wp]" ).val(),
+		slug = el_notice.find( "input[name=slug]" ).val(),
 		drip_plugin = el_notice.find( "input[name=drip_plugin]" ).val(),
 		inp_email = el_notice.find( "input[name=email]" )
 		btn_act = el_notice.find( ".iworks-notice-act" ),
@@ -56,8 +56,8 @@ jQuery(function() {
 
 	// Open a tab to rate the plugin.
 	function act_rate() {
-		var url = url_wp.replace( /\/plugins\//, "/support/view/plugin-reviews/" ) + "?rate=5#new-post",
-			link = jQuery( '<a href="' + url + '" target="_blank">Rate</a>' );
+		var url = 'https://wordpress.org/support/plugin/'+slug+'/reviews/?rate=5#new-post';
+        var link = jQuery( '<a href="' + url + '" target="_blank">Rate</a>' );
 
 		link.appendTo( "body" );
 		link[0].click();

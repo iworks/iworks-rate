@@ -118,26 +118,18 @@ if ( ! class_exists( 'iworks_rate' ) ) {
 		 * @since  1.0.0
 		 * @param  string $plugin_id WordPress plugin-ID (see: plugin_basename).
 		 * @param  string $title Plugin name for display.
-		 * @param  string $url_wp URL to the plugin on wp.org (domain not needed)
-		 * @param  string $cta_email Title of the Email CTA button.
-		 * @param  string $drip_plugin Optional. Plugin-param for the getdrip rule.
+		 * @param  string $slug the plugin slug on wp.org
 		 */
-		public function iworks_register_plugin( $plugin_id, $title, $url_wp, $cta_email = '', $drip_plugin = '' ) {
+		public function iworks_register_plugin( $plugin_id, $title, $slug ) {
 			// Ignore incorrectly registered plugins to avoid errors later.
 			if ( empty( $plugin_id ) ) { return; }
 			if ( empty( $title ) ) { return; }
-			if ( empty( $url_wp ) ) { return; }
-
-			if ( false === strpos( $url_wp, '://' ) ) {
-				$url_wp = 'https://wordpress.org/' . trim( $url_wp, '/' );
-			}
+			if ( empty( $slug ) ) { return; }
 
 			$this->plugins[ $plugin_id ] = (object) array(
 				'id' => $plugin_id,
 				'title' => $title,
-				'url_wp' => $url_wp,
-				'cta_email' => $cta_email,
-				'drip_plugin' => $drip_plugin,
+				'slug' => $slug,
 			);
 
 			/*
@@ -355,17 +347,15 @@ if ( ! class_exists( 'iworks_rate' ) ) {
 		 */
 		protected function render_message( $info ) {
 			$plugin = $this->plugins[ $info->plugin ];
-			$css_url = plugin_dir_url( __FILE__ ) . '/admin.css';
-			$js_url = plugin_dir_url( __FILE__ ) . '/admin.js';
-
+			$css_url = plugin_dir_url( __FILE__ ) . 'admin.css';
+			$js_url = plugin_dir_url( __FILE__ ) . 'admin.js';
 			do_action( 'iworks_rate_css' );
 			?>
 			<link rel="stylesheet" type="text/css" href="<?php echo esc_url( $css_url ); ?>" />
 			<div class="notice iworks-notice iworks-notice-<?php echo esc_attr( $info->type ); ?> iworks-notice-<?php echo esc_attr( dirname( $info->plugin ) ); ?>" style="display:none">
 				<input type="hidden" name="type" value="<?php echo esc_attr( $info->type ); ?>" />
 				<input type="hidden" name="plugin_id" value="<?php echo esc_attr( $info->plugin ); ?>" />
-				<input type="hidden" name="url_wp" value="<?php echo esc_attr( $plugin->url_wp ); ?>" />
-				<input type="hidden" name="drip_plugin" value="<?php echo esc_attr( $plugin->drip_plugin ); ?>" />
+				<input type="hidden" name="slug" value="<?php echo esc_attr( $this->plugins[ $info->plugin ]->slug ); ?>" />
 				<?php
 					$this->render_rate_message( $plugin );
 				?>
