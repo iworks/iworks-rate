@@ -130,14 +130,17 @@ if ( ! class_exists( 'iworks_rate' ) ) {
 		 */
 		public function iworks_register_plugin( $plugin_id, $title, $slug ) {
 			// Ignore incorrectly registered plugins to avoid errors later.
-			if ( empty( $plugin_id ) ) { return; }
-			if ( empty( $title ) ) { return; }
-			if ( empty( $slug ) ) { return; }
+			if ( empty( $plugin_id ) ) {
+				return; }
+			if ( empty( $title ) ) {
+				return; }
+			if ( empty( $slug ) ) {
+				return; }
 
 			$this->plugins[ $plugin_id ] = (object) array(
-				'id' => $plugin_id,
+				'id'    => $plugin_id,
 				'title' => $title,
-				'slug' => $slug,
+				'slug'  => $slug,
 			);
 
 			/*
@@ -149,9 +152,9 @@ if ( ! class_exists( 'iworks_rate' ) ) {
 				// First register the plugin permanently.
 				$this->stored['plugins'][ $plugin_id ] = time();
 
-				$hash = md5( $plugin_id . '-rate' );
+				$hash                           = md5( $plugin_id . '-rate' );
 				$this->stored['queue'][ $hash ] = array(
-					'plugin' => $plugin_id,
+					'plugin'  => $plugin_id,
 					'show_at' => time() + 7 * DAY_IN_SECONDS,
 				);
 
@@ -215,7 +218,8 @@ if ( ! class_exists( 'iworks_rate' ) ) {
 		 */
 		public function all_admin_notices() {
 			$info = $this->choose_message();
-			if ( ! $info ) { return; }
+			if ( ! $info ) {
+				return; }
 
 			$this->render_message( $info );
 		}
@@ -232,8 +236,8 @@ if ( ! class_exists( 'iworks_rate' ) ) {
 		 *         string $plugin WordPress plugin ID?
 		 */
 		protected function choose_message() {
-			$obj = false;
-			$chosen = false;
+			$obj      = false;
+			$chosen   = false;
 			$earliest = false;
 
 			$now = time();
@@ -241,15 +245,18 @@ if ( ! class_exists( 'iworks_rate' ) ) {
 			// The "current" time can be changed via $_GET to test the module.
 			if ( defined( 'WP_DEBUG' ) && WP_DEBUG && ! empty( $_GET['time'] ) ) {
 				$custom_time = $_GET['time'];
-				if ( ' ' == $custom_time[0] ) { $custom_time[0] = '+'; }
-				if ( $custom_time ) { $now = strtotime( $custom_time ); }
-				if ( ! $now ) { $now = time(); }
+				if ( ' ' == $custom_time[0] ) {
+					$custom_time[0] = '+'; }
+				if ( $custom_time ) {
+					$now = strtotime( $custom_time ); }
+				if ( ! $now ) {
+					$now = time(); }
 			}
 
 			$tomorrow = $now + DAY_IN_SECONDS;
 
 			foreach ( $this->stored['queue'] as $hash => $item ) {
-				$show_at = intval( $item['show_at'] );
+				$show_at   = intval( $item['show_at'] );
 				$is_sticky = ! empty( $item['sticky'] );
 
 				if ( ! isset( $this->plugins[ $item['plugin'] ] ) ) {
@@ -267,7 +274,8 @@ if ( ! class_exists( 'iworks_rate' ) ) {
 					$can_display = false;
 				}
 
-				if ( ! $can_display ) { continue; }
+				if ( ! $can_display ) {
+					continue; }
 
 				if ( $is_sticky ) {
 					// If sticky item is present then choose it!
@@ -275,7 +283,7 @@ if ( ! class_exists( 'iworks_rate' ) ) {
 					break;
 				} elseif ( ! $earliest || $earliest < $show_at ) {
 					$earliest = $show_at;
-					$chosen = $hash;
+					$chosen   = $hash;
 					// Don't use `break` because a sticky item might follow...
 					// Find the item with the earliest schedule.
 				}
@@ -316,15 +324,15 @@ if ( ! class_exists( 'iworks_rate' ) ) {
 			foreach ( $this->stored['queue'] as $hash => $item ) {
 				unset( $this->stored['queue'][ $hash ]['sticky'] );
 
-				if ( $item['plugin'] == $plugin  ) {
+				if ( $item['plugin'] == $plugin ) {
 					$done_item = $item;
 					unset( $this->stored['queue'][ $hash ] );
 				}
 			}
 
 			if ( $done_item ) {
-				$done_item['state'] = $state;
-				$done_item['hash'] = $hash;
+				$done_item['state']      = $state;
+				$done_item['hash']       = $hash;
 				$done_item['handled_at'] = time();
 				unset( $done_item['sticky'] );
 
@@ -359,10 +367,10 @@ if ( ! class_exists( 'iworks_rate' ) ) {
 		 * @since  1.0.0
 		 */
 		protected function render_rate_message( $plugin ) {
-			$user = wp_get_current_user();
+			$user      = wp_get_current_user();
 			$user_name = $user->display_name;
 
-			$msg = __( "Hey %s, you've been using %s for a while now, and we hope you're happy with it.", 'IWORKS_RATE_TEXTDOMAIN' ) . '<br />'. __( "We've spent countless hours developing this free plugin for you, and we would really appreciate it if you dropped us a quick rating!", 'IWORKS_RATE_TEXTDOMAIN' );
+			$msg = __( "Hey %1\$s, you've been using %2\$s for a while now, and we hope you're happy with it.", 'IWORKS_RATE_TEXTDOMAIN' ) . '<br />' . __( "We've spent countless hours developing this free plugin for you, and we would really appreciate it if you dropped us a quick rating!", 'IWORKS_RATE_TEXTDOMAIN' );
 			$msg = apply_filters( 'iworks-rating-message-' . $plugin->id, $msg );
 
 			?>
@@ -382,7 +390,8 @@ if ( ! class_exists( 'iworks_rate' ) ) {
 						printf(
 							__( 'Rate %s', 'IWORKS_RATE_TEXTDOMAIN' ),
 							esc_html( $plugin->title )
-						); ?>
+						);
+						?>
 					</button>
 					<button class="iworks-notice-dismiss" data-msg="<?php _e( 'Saving', 'IWORKS_RATE_TEXTDOMAIN' ); ?>">
 						<?php _e( 'No thanks', 'IWORKS_RATE_TEXTDOMAIN' ); ?>
@@ -400,7 +409,7 @@ if ( ! class_exists( 'iworks_rate' ) ) {
 		protected function add_action( $hook, $params = 1 ) {
 			$method_name = strtolower( $hook );
 			$method_name = preg_replace( '/[^a-z0-9]/', '_', $method_name );
-			$handler = array( $this, $method_name );
+			$handler     = array( $this, $method_name );
 			add_action( $hook, $handler, 5, $params );
 		}
 	}
