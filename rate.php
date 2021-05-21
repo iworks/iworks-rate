@@ -2,7 +2,7 @@
 /**
  * iWorks_Rate - Dashboard Notification module.
  *
- * @version 1.0.1
+ * @version 1.0.2
  * @author  iworks (Marcin Pietrzak)
  * @author  Incsub (Philipp Stracker)
  *
@@ -21,7 +21,7 @@ if ( ! class_exists( 'iworks_rate' ) ) {
 		 * @since 1.0.1
 		 * @var   string
 		 */
-		private $version = '1.0.1';
+		private $version = '1.0.2';
 
 		/**
 		 * $wpdb->options field name.
@@ -57,11 +57,9 @@ if ( ! class_exists( 'iworks_rate' ) ) {
 		 */
 		static public function instance() {
 			static $Inst = null;
-
 			if ( null === $Inst ) {
 				$Inst = new iworks_rate();
 			}
-
 			return $Inst;
 		}
 
@@ -72,10 +70,8 @@ if ( ! class_exists( 'iworks_rate' ) ) {
 		 */
 		private function __construct() {
 			$this->read_stored_data();
-
 			$this->add_action( 'iworks-register-plugin', 5 );
 			$this->add_action( 'load-index.php' );
-
 			$this->add_action( 'wp_ajax_iworks_act' );
 			$this->add_action( 'wp_ajax_iworks_dismiss' );
 		}
@@ -87,26 +83,21 @@ if ( ! class_exists( 'iworks_rate' ) ) {
 		 */
 		protected function read_stored_data() {
 			$data = get_site_option( $this->option_name, false, false );
-
 			if ( ! is_array( $data ) ) {
 				$data = array();
 			}
-
 			// A list of all plugins with timestamp of first registration.
 			if ( ! isset( $data['plugins'] ) || ! is_array( $data['plugins'] ) ) {
 				$data['plugins'] = array();
 			}
-
 			// A list with pending messages and earliest timestamp for display.
 			if ( ! isset( $data['queue'] ) || ! is_array( $data['queue'] ) ) {
 				$data['queue'] = array();
 			}
-
 			// A list with all messages that were handles already.
 			if ( ! isset( $data['done'] ) || ! is_array( $data['done'] ) ) {
 				$data['done'] = array();
 			}
-
 			$this->stored = $data;
 		}
 
@@ -135,14 +126,13 @@ if ( ! class_exists( 'iworks_rate' ) ) {
 			if ( empty( $title ) ) {
 				return; }
 			if ( empty( $slug ) ) {
-				return; }
-
+				return;
+			}
 			$this->plugins[ $plugin_id ] = (object) array(
 				'id'    => $plugin_id,
 				'title' => $title,
 				'slug'  => $slug,
 			);
-
 			/*
 			 * When the plugin is registered the first time we store some infos
 			 * in the persistent module-data that help us later to find out
@@ -151,16 +141,27 @@ if ( ! class_exists( 'iworks_rate' ) ) {
 			if ( empty( $this->stored['plugins'][ $plugin_id ] ) ) {
 				// First register the plugin permanently.
 				$this->stored['plugins'][ $plugin_id ] = time();
-
-				$hash                           = md5( $plugin_id . '-rate' );
-				$this->stored['queue'][ $hash ] = array(
+				$hash                                  = md5( $plugin_id . '-rate' );
+				$this->stored['queue'][ $hash ]        = array(
 					'plugin'  => $plugin_id,
 					'show_at' => time() + 7 * DAY_IN_SECONDS,
 				);
-
 				// Finally save the details.
 				$this->store_data();
 			}
+		}
+
+		/**
+		 * filter input value
+		 *
+		 * @since 1.0.2
+		 */
+		private function get_plugin_from_post() {
+			$plugin = filter_input( INPUT_POST, 'plugin_id', FILTER_SANITIZE_STRING );
+			if ( empty( $plugin ) ) {
+				return new WP_Error( 'error', __( 'Plugin ID can not be empty.', 'IWORKS_RATE_TEXTDOMAIN' ) );
+			}
+			return $plugin;
 		}
 
 		/**
@@ -169,7 +170,10 @@ if ( ! class_exists( 'iworks_rate' ) ) {
 		 * @since  1.0.0
 		 */
 		public function wp_ajax_iworks_act() {
-			$plugin = $_POST['plugin_id'];
+			$plugin = $this->get_plugin_from_post();
+			if ( is_wp_error( $plugin ) ) {
+				wp_send_json_error();
+			}
 			$this->mark_as_done( $plugin, 'ok' );
 			wp_send_json_success();
 		}
@@ -180,7 +184,10 @@ if ( ! class_exists( 'iworks_rate' ) ) {
 		 * @since  1.0.0
 		 */
 		public function wp_ajax_iworks_dismiss() {
-			$plugin = $_POST['plugin_id'];
+			$plugin = $this->get_plugin_from_post();
+			if ( is_wp_error( $plugin ) ) {
+				wp_send_json_error();
+			}
 			$this->mark_as_done( $plugin, 'ignore' );
 			wp_send_json_success();
 		}
@@ -219,8 +226,8 @@ if ( ! class_exists( 'iworks_rate' ) ) {
 		public function all_admin_notices() {
 			$info = $this->choose_message();
 			if ( ! $info ) {
-				return; }
-
+				return;
+			}
 			$this->render_message( $info );
 		}
 
@@ -239,32 +246,19 @@ if ( ! class_exists( 'iworks_rate' ) ) {
 			$obj      = false;
 			$chosen   = false;
 			$earliest = false;
-
-			$now = time();
-
-			// The "current" time can be changed via $_GET to test the module.
-			if ( defined( 'WP_DEBUG' ) && WP_DEBUG && ! empty( $_GET['time'] ) ) {
-				$custom_time = $_GET['time'];
-				if ( ' ' == $custom_time[0] ) {
-					$custom_time[0] = '+'; }
-				if ( $custom_time ) {
-					$now = strtotime( $custom_time ); }
-				if ( ! $now ) {
-					$now = time(); }
-			}
-
+			/**
+			 * change time by filter
+			 */
+			$now      = apply_filters( 'iworks_rate_set_custom_time', time() );
 			$tomorrow = $now + DAY_IN_SECONDS;
-
 			foreach ( $this->stored['queue'] as $hash => $item ) {
 				$show_at   = intval( $item['show_at'] );
 				$is_sticky = ! empty( $item['sticky'] );
-
 				if ( ! isset( $this->plugins[ $item['plugin'] ] ) ) {
 					// Deactivated plugin before the message was displayed.
 					continue;
 				}
-				$plugin = $this->plugins[ $item['plugin'] ];
-
+				$plugin      = $this->plugins[ $item['plugin'] ];
 				$can_display = true;
 				if ( wp_is_mobile() ) {
 					$can_display = false;
@@ -273,10 +267,9 @@ if ( ! class_exists( 'iworks_rate' ) ) {
 					// Do not display messages that are not due yet.
 					$can_display = false;
 				}
-
 				if ( ! $can_display ) {
-					continue; }
-
+					continue;
+				}
 				if ( $is_sticky ) {
 					// If sticky item is present then choose it!
 					$chosen = $hash;
@@ -288,26 +281,20 @@ if ( ! class_exists( 'iworks_rate' ) ) {
 					// Find the item with the earliest schedule.
 				}
 			}
-
 			if ( $chosen ) {
 				// Make the chosen item sticky.
 				$this->stored['queue'][ $chosen ]['sticky'] = true;
-
 				// Re-schedule other messages that are due today.
 				foreach ( $this->stored['queue'] as $hash => $item ) {
 					$show_at = intval( $item['show_at'] );
-
 					if ( empty( $item['sticky'] ) && $tomorrow > $show_at ) {
 						$this->stored['queue'][ $hash ]['show_at'] = $tomorrow;
 					}
 				}
-
 				// Save the changes.
 				$this->store_data();
-
 				$obj = (object) $this->stored['queue'][ $chosen ];
 			}
-
 			return $obj;
 		}
 
@@ -320,22 +307,18 @@ if ( ! class_exists( 'iworks_rate' ) ) {
 		 */
 		protected function mark_as_done( $plugin, $state ) {
 			$done_item = false;
-
 			foreach ( $this->stored['queue'] as $hash => $item ) {
 				unset( $this->stored['queue'][ $hash ]['sticky'] );
-
 				if ( $item['plugin'] == $plugin ) {
 					$done_item = $item;
 					unset( $this->stored['queue'][ $hash ] );
 				}
 			}
-
 			if ( $done_item ) {
 				$done_item['state']      = $state;
 				$done_item['hash']       = $hash;
 				$done_item['handled_at'] = time();
 				unset( $done_item['sticky'] );
-
 				$this->stored['done'][] = $done_item;
 				$this->store_data();
 			}
@@ -369,10 +352,8 @@ if ( ! class_exists( 'iworks_rate' ) ) {
 		protected function render_rate_message( $plugin ) {
 			$user      = wp_get_current_user();
 			$user_name = $user->display_name;
-
-			$msg = __( "Hey %1\$s, you've been using %2\$s for a while now, and we hope you're happy with it.", 'IWORKS_RATE_TEXTDOMAIN' ) . '<br />' . __( "We've spent countless hours developing this free plugin for you, and we would really appreciate it if you dropped us a quick rating!", 'IWORKS_RATE_TEXTDOMAIN' );
-			$msg = apply_filters( 'iworks-rating-message-' . $plugin->id, $msg );
-
+			$msg       = __( "Hey %1\$s, you've been using %2\$s for a while now, and we hope you're happy with it.", 'IWORKS_RATE_TEXTDOMAIN' ) . '<br />' . __( "We've spent countless hours developing this free plugin for you, and we would really appreciate it if you dropped us a quick rating!", 'IWORKS_RATE_TEXTDOMAIN' );
+			$msg       = apply_filters( 'iworks-rating-message-' . $plugin->id, $msg );
 			?>
 			<div class="iworks-notice-logo"><span></span></div>
 				<div class="iworks-notice-message">
