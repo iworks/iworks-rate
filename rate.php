@@ -2,7 +2,7 @@
 /**
  * iWorks_Rate - Dashboard Notification module.
  *
- * @version 1.0.2
+ * @version 1.0.3
  * @author  iworks (Marcin Pietrzak)
  * @author  Incsub (Philipp Stracker)
  *
@@ -21,7 +21,7 @@ if ( ! class_exists( 'iworks_rate' ) ) {
 		 * @since 1.0.1
 		 * @var   string
 		 */
-		private $version = '1.0.2';
+		private $version = '1.0.3';
 
 		/**
 		 * $wpdb->options field name.
