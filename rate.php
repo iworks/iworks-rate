@@ -355,7 +355,7 @@ if ( ! class_exists( 'iworks_rate' ) ) {
 			$msg       = __( "Hey %1\$s, you've been using %2\$s for a while now, and we hope you're happy with it.", 'IWORKS_RATE_TEXTDOMAIN' ) . '<br />' . __( "We've spent countless hours developing this free plugin for you, and we would really appreciate it if you dropped us a quick rating!", 'IWORKS_RATE_TEXTDOMAIN' );
 			$msg       = apply_filters( 'iworks-rating-message-' . $plugin->id, $msg );
 			?>
-			<div class="iworks-notice-logo"><span></span></div>
+				<div class="iworks-notice-logo" style="<?php echo esc_attr( apply_filters( 'iworks_rate_notice_logo_style', '', $plugin ) ); ?>"><span></span></div>
 				<div class="iworks-notice-message">
 					<?php
 					printf(
