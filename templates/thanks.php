@@ -2,10 +2,6 @@
 /**
  * Notice displayed in admin panel.
  */
-
-
-d( $args );
-
 ?>
 <div
 	class="notice notice-success is-dismissible notice-iworks-rate"
