@@ -2,14 +2,8 @@
 /**
  * iWorks_Rate - Dashboard Notification module.
  *
- * @version 1.0.3
+ * @version 2.0.0
  * @author  iworks (Marcin Pietrzak)
- * @author  Incsub (Philipp Stracker)
- *
- * Based on:
- *
- * WPMUDEV iworks - Free Dashboard Notification module.
- * Used by wordpress.org hosted plugins.
  *
  */
 if ( ! class_exists( 'iworks_rate' ) ) {
@@ -21,7 +15,7 @@ if ( ! class_exists( 'iworks_rate' ) ) {
 		 * @since 1.0.1
 		 * @var   string
 		 */
-		private $version = '1.0.3';
+		private $version = '2.0.0';
 
 		/**
 		 * $wpdb->options field name.
@@ -29,7 +23,7 @@ if ( ! class_exists( 'iworks_rate' ) ) {
 		 * @since 1.0.0
 		 * @var   string
 		 */
-		protected $option_name = 'iworks_rate';
+		protected $option_name = 'iworks_rates';
 
 		/**
 		 * List of all registered plugins.
@@ -69,36 +63,29 @@ if ( ! class_exists( 'iworks_rate' ) ) {
 		 * @since  1.0.0
 		 */
 		private function __construct() {
-			$this->read_stored_data();
-			$this->add_action( 'iworks-register-plugin', 5 );
-			$this->add_action( 'load-index.php' );
-			$this->add_action( 'wp_ajax_iworks_act' );
-			$this->add_action( 'wp_ajax_iworks_dismiss' );
+			/**
+			 * settings
+			 */
+			$this->stored = wp_parse_args(
+				get_site_option( $this->option_name, false, false ),
+				array()
+			);
+			/**
+			 * actions
+			 */
+			add_action( 'load-index.php', array( $this, 'load' ) );
+			add_action( 'iworks-register-plugin', array( $this, 'register' ), 5, 3 );
+			add_action( 'wp_ajax_iworks_rate_button', array( $this, 'ajax_button' ) );
 		}
 
-		/**
-		 * Load persistent module-data from the WP Database.
-		 *
-		 * @since  1.0.0
-		 */
-		protected function read_stored_data() {
-			$data = get_site_option( $this->option_name, false, false );
-			if ( ! is_array( $data ) ) {
-				$data = array();
+		public function load() {
+			$plugin_id = $this->choose_plugin();
+			if ( empty( $plugin_id ) ) {
+				return;
 			}
-			// A list of all plugins with timestamp of first registration.
-			if ( ! isset( $data['plugins'] ) || ! is_array( $data['plugins'] ) ) {
-				$data['plugins'] = array();
-			}
-			// A list with pending messages and earliest timestamp for display.
-			if ( ! isset( $data['queue'] ) || ! is_array( $data['queue'] ) ) {
-				$data['queue'] = array();
-			}
-			// A list with all messages that were handles already.
-			if ( ! isset( $data['done'] ) || ! is_array( $data['done'] ) ) {
-				$data['done'] = array();
-			}
-			$this->stored = $data;
+			$this->plugin_id = $plugin_id;
+			add_action( 'admin_enqueue_scripts', array( $this, 'enqueue' ) );
+			add_action( 'admin_notices', array( $this, 'show' ) );
 		}
 
 		/**
@@ -119,32 +106,30 @@ if ( ! class_exists( 'iworks_rate' ) ) {
 		 * @param  string $title Plugin name for display.
 		 * @param  string $slug the plugin slug on wp.org
 		 */
-		public function iworks_register_plugin( $plugin_id, $title, $slug ) {
+		public function register( $plugin_id, $title, $slug ) {
 			// Ignore incorrectly registered plugins to avoid errors later.
-			if ( empty( $plugin_id ) ) {
-				return; }
-			if ( empty( $title ) ) {
-				return; }
-			if ( empty( $slug ) ) {
+			if ( empty( $plugin_id ) || empty( $title ) || empty( $slug ) ) {
 				return;
 			}
-			$this->plugins[ $plugin_id ] = (object) array(
-				'id'    => $plugin_id,
+			$data                        = array(
 				'title' => $title,
 				'slug'  => $slug,
 			);
+			$this->plugins[ $plugin_id ] = $data;
 			/*
 			 * When the plugin is registered the first time we store some infos
 			 * in the persistent module-data that help us later to find out
 			 * if/which message should be displayed.
 			 */
-			if ( empty( $this->stored['plugins'][ $plugin_id ] ) ) {
-				// First register the plugin permanently.
-				$this->stored['plugins'][ $plugin_id ] = time();
-				$hash                                  = md5( $plugin_id . '-rate' );
-				$this->stored['queue'][ $hash ]        = array(
-					'plugin'  => $plugin_id,
-					'show_at' => time() + 7 * DAY_IN_SECONDS,
+			if ( empty( $this->stored[ $plugin_id ] ) ) {
+				$this->stored[ $plugin_id ] = wp_parse_args(
+					array(
+						'registered' => time(),
+						'show_at'    => time() + rand( 7, 14 ) * DAY_IN_SECONDS,
+						'rated'      => 0,
+						'hide'       => 0,
+					),
+					$data
 				);
 				// Finally save the details.
 				$this->store_data();
@@ -152,30 +137,57 @@ if ( ! class_exists( 'iworks_rate' ) ) {
 		}
 
 		/**
-		 * filter input value
-		 *
-		 * @since 1.0.2
-		 */
-		private function get_plugin_from_post() {
-			$plugin = filter_input( INPUT_POST, 'plugin_id', FILTER_SANITIZE_STRING );
-			if ( empty( $plugin ) ) {
-				return new WP_Error( 'error', __( 'Plugin ID can not be empty.', 'IWORKS_RATE_TEXTDOMAIN' ) );
-			}
-			return $plugin;
-		}
-
-		/**
 		 * Ajax handler called when the user chooses the CTA button.
 		 *
 		 * @since  1.0.0
 		 */
-		public function wp_ajax_iworks_act() {
-			$plugin = $this->get_plugin_from_post();
-			if ( is_wp_error( $plugin ) ) {
+		public function ajax_button() {
+			$plugin_id = filter_input( INPUT_POST, 'plugin_id', FILTER_SANITIZE_STRING );
+			if ( empty( $plugin_id ) ) {
 				wp_send_json_error();
 			}
-			$this->mark_as_done( $plugin, 'ok' );
+			if ( ! isset( $this->plugins[ $plugin_id ] ) ) {
+				wp_send_json_error();
+			}
+			switch ( filter_input( INPUT_POST, 'button', FILTER_SANITIZE_STRING ) ) {
+				case '':
+				case 'add-review':
+					$this->add_weeks( $plugin_id );
+					wp_send_json_success();
+				case 'hide':
+					$this->add_weeks( $plugin_id );
+					$this->hide( $plugin_id );
+					wp_send_json_success();
+				case 'donate':
+					$this->add_months( $plugin_id );
+					wp_send_json_success();
+			}
+
 			wp_send_json_success();
+		}
+
+		public function hide( $plugin_id ) {
+			if ( ! isset( $this->stored[ $plugin_id ] ) ) {
+				return;
+			}
+			$this->stored[ $plugin_id ]['rated'] = time();
+			$this->store_data();
+		}
+
+		private function add_weeks( $plugin_id ) {
+			if ( ! isset( $this->stored[ $plugin_id ] ) ) {
+				return;
+			}
+			$this->stored[ $plugin_id ]['show_at'] = time() + rand( 2, 3 ) * WEEK_IN_SECONDS + rand( 0, 3 ) * DAY_IN_SECONDS;
+			$this->store_data();
+		}
+
+		private function add_months( $plugin_id ) {
+			if ( ! isset( $this->stored[ $plugin_id ] ) ) {
+				return;
+			}
+			$this->stored[ $plugin_id ]['show_at'] = time() + rand( 10, 15 ) * WEEK_IN_SECONDS + rand( 0, 7 ) * DAY_IN_SECONDS;
+			$this->store_data();
 		}
 
 		/**
@@ -183,12 +195,11 @@ if ( ! class_exists( 'iworks_rate' ) ) {
 		 *
 		 * @since  1.0.0
 		 */
-		public function wp_ajax_iworks_dismiss() {
+		public function dismiss() {
 			$plugin = $this->get_plugin_from_post();
 			if ( is_wp_error( $plugin ) ) {
 				wp_send_json_error();
 			}
-			$this->mark_as_done( $plugin, 'ignore' );
 			wp_send_json_success();
 		}
 
@@ -198,23 +209,20 @@ if ( ! class_exists( 'iworks_rate' ) ) {
 		 *
 		 * @since  1.0.0
 		 */
-		public function load_index_php() {
-			if ( is_super_admin() ) {
-				$this->add_action( 'all_admin_notices' );
-				wp_enqueue_style(
-					__CLASS__,
-					plugin_dir_url( __FILE__ ) . 'admin.css',
-					array(),
-					$this->version
-				);
-				wp_enqueue_script(
-					__CLASS__,
-					plugin_dir_url( __FILE__ ) . 'admin.js',
-					array(),
-					$this->version,
-					true
-				);
-			}
+		public function enqueue() {
+			wp_enqueue_style(
+				__CLASS__,
+				plugin_dir_url( __FILE__ ) . 'admin.css',
+				array(),
+				$this->version
+			);
+			wp_enqueue_script(
+				__CLASS__,
+				plugin_dir_url( __FILE__ ) . 'admin.js',
+				array(),
+				$this->version,
+				true
+			);
 		}
 
 		/**
@@ -223,12 +231,8 @@ if ( ! class_exists( 'iworks_rate' ) ) {
 		 *
 		 * @since  1.0.0
 		 */
-		public function all_admin_notices() {
-			$info = $this->choose_message();
-			if ( ! $info ) {
-				return;
-			}
-			$this->render_message( $info );
+		public function show() {
+			$this->render_message( $this->plugin_id );
 		}
 
 		/**
@@ -242,157 +246,63 @@ if ( ! class_exists( 'iworks_rate' ) ) {
 		 * @return object|false
 		 *         string $plugin WordPress plugin ID?
 		 */
-		protected function choose_message() {
-			$obj      = false;
-			$chosen   = false;
-			$earliest = false;
+		protected function choose_plugin() {
+			$choosen_plugin_id = false;
+			if ( wp_is_mobile() ) {
+				return $choosen_plugin_id;
+			}
 			/**
 			 * change time by filter
 			 */
-			$now      = apply_filters( 'iworks_rate_set_custom_time', time() );
-			$tomorrow = $now + DAY_IN_SECONDS;
-			foreach ( $this->stored['queue'] as $hash => $item ) {
-				$show_at   = intval( $item['show_at'] );
-				$is_sticky = ! empty( $item['sticky'] );
-				if ( ! isset( $this->plugins[ $item['plugin'] ] ) ) {
-					// Deactivated plugin before the message was displayed.
-					continue;
-				}
-				$plugin      = $this->plugins[ $item['plugin'] ];
-				$can_display = true;
-				if ( wp_is_mobile() ) {
-					$can_display = false;
-				}
-				if ( $now < $show_at ) {
-					// Do not display messages that are not due yet.
-					$can_display = false;
-				}
-				if ( ! $can_display ) {
-					continue;
-				}
-				if ( $is_sticky ) {
-					// If sticky item is present then choose it!
-					$chosen = $hash;
-					break;
-				} elseif ( ! $earliest || $earliest < $show_at ) {
-					$earliest = $show_at;
-					$chosen   = $hash;
-					// Don't use `break` because a sticky item might follow...
-					// Find the item with the earliest schedule.
-				}
-			}
-			if ( $chosen ) {
-				// Make the chosen item sticky.
-				$this->stored['queue'][ $chosen ]['sticky'] = true;
-				// Re-schedule other messages that are due today.
-				foreach ( $this->stored['queue'] as $hash => $item ) {
-					$show_at = intval( $item['show_at'] );
-					if ( empty( $item['sticky'] ) && $tomorrow > $show_at ) {
-						$this->stored['queue'][ $hash ]['show_at'] = $tomorrow;
+			$now = apply_filters( 'iworks_rate_set_custom_time', time() );
+			foreach ( $this->stored as $plugin_id => $item ) {
+				if ( ! isset( $this->plugins[ $plugin_id ] ) ) {
+					if ( isset( $this->stored[ $plugin_id ] ) ) {
+						unset( $this->stored[ $plugin_id ] );
+						$this->store_data();
 					}
+					continue;
 				}
-				// Save the changes.
-				$this->store_data();
-				$obj = (object) $this->stored['queue'][ $chosen ];
+				if ( intval( $item['show_at'] ) > $now ) {
+					continue;
+				}
+				if ( false === $choosen_plugin_id ) {
+					$choosen_plugin_id = $plugin_id;
+				}
 			}
-			return $obj;
+			return $choosen_plugin_id;
 		}
 
-		/**
-		 * Moves a message from the queue to the done list.
-		 *
-		 * @since  1.0.0
-		 * @param  string $plugin Plugin ID.
-		 * @param  string $state [ok|ignore] Button clicked.
-		 */
-		protected function mark_as_done( $plugin, $state ) {
-			$done_item = false;
-			foreach ( $this->stored['queue'] as $hash => $item ) {
-				unset( $this->stored['queue'][ $hash ]['sticky'] );
-				if ( $item['plugin'] == $plugin ) {
-					$done_item = $item;
-					unset( $this->stored['queue'][ $hash ] );
-				}
-			}
-			if ( $done_item ) {
-				$done_item['state']      = $state;
-				$done_item['hash']       = $hash;
-				$done_item['handled_at'] = time();
-				unset( $done_item['sticky'] );
-				$this->stored['done'][] = $done_item;
-				$this->store_data();
-			}
-		}
 
 		/**
 		 * Renders the actual Notification message.
 		 *
 		 * @since  1.0.0
 		 */
-		protected function render_message( $info ) {
-			$plugin = $this->plugins[ $info->plugin ];
-			do_action( 'iworks_rate_css' );
-			?>
-			<div class="notice iworks-notice iworks-notice-rate iworks-notice-<?php echo esc_attr( dirname( $info->plugin ) ); ?>" style="display:none">
-				<input type="hidden" name="plugin_id" value="<?php echo esc_attr( $info->plugin ); ?>" />
-				<input type="hidden" name="slug" value="<?php echo esc_attr( $plugin->slug ); ?>" />
-				<?php
-					$this->render_rate_message( $plugin );
-				?>
-			</div>
-			<?php
+		protected function render_message( $plugin_id ) {
+			$file                = sprintf(
+				'%s/templates/%s.php',
+				dirname( __FILE__ ),
+				'thanks'
+			);
+			$plugin              = wp_parse_args(
+				$this->plugins[ $plugin_id ],
+				$this->stored[ $plugin_id ]
+			);
+			$plugin['plugin_id'] = $plugin_id;
+			$plugin['logo']      = apply_filters( 'iworks_rate_notice_logo_style', '', $plugin );
+			$plugin['ajax_url']  = admin_url( 'admin-ajax.php' );
+			$plugin['classes']   = array(
+				'iworks-rate',
+				'iworks-rate-' . $plugin['slug'],
+				'iworks-rate-notice',
+			);
+			if ( ! empty( $plugin['logo'] ) ) {
+				$plugin['classes'][] = 'has-logo';
+			}
+			load_template( $file, true, $plugin );
 		}
 
-		/**
-		 * Output the contents of the rate-this-plugin message.
-		 * No return value. The code is directly output.
-		 *
-		 * @since  1.0.0
-		 */
-		protected function render_rate_message( $plugin ) {
-			$user      = wp_get_current_user();
-			$user_name = $user->display_name;
-			$msg       = __( "Hey %1\$s, you've been using %2\$s for a while now, and we hope you're happy with it.", 'IWORKS_RATE_TEXTDOMAIN' ) . '<br />' . __( "We've spent countless hours developing this free plugin for you, and we would really appreciate it if you dropped us a quick rating!", 'IWORKS_RATE_TEXTDOMAIN' );
-			$msg       = apply_filters( 'iworks-rating-message-' . $plugin->id, $msg );
-			?>
-				<div class="iworks-notice-logo" style="<?php echo esc_attr( apply_filters( 'iworks_rate_notice_logo_style', '', $plugin ) ); ?>"><span></span></div>
-				<div class="iworks-notice-message">
-					<?php
-					printf(
-						$msg,
-						'<strong>' . $user_name . '</strong>',
-						'<strong>' . $plugin->title . '</strong>'
-					);
-					?>
-				</div>
-				<div class="iworks-notice-cta">
-					<button class="iworks-notice-act button-primary" data-msg="<?php _e( 'Thanks :)', 'IWORKS_RATE_TEXTDOMAIN' ); ?>">
-						<?php
-						printf(
-							__( 'Rate %s', 'IWORKS_RATE_TEXTDOMAIN' ),
-							esc_html( $plugin->title )
-						);
-						?>
-					</button>
-					<button class="iworks-notice-dismiss" data-msg="<?php _e( 'Saving', 'IWORKS_RATE_TEXTDOMAIN' ); ?>">
-						<?php _e( 'No thanks', 'IWORKS_RATE_TEXTDOMAIN' ); ?>
-					</button>
-				</div>
-			<?php
-		}
-
-		/**
-		 * Registers a new action handler. The callback function has the same
-		 * name as the action hook.
-		 *
-		 * @since 1.0.0
-		 */
-		protected function add_action( $hook, $params = 1 ) {
-			$method_name = strtolower( $hook );
-			$method_name = preg_replace( '/[^a-z0-9]/', '_', $method_name );
-			$handler     = array( $this, $method_name );
-			add_action( $hook, $handler, 5, $params );
-		}
 	}
 
 	// Initialize the module.
