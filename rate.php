@@ -162,7 +162,6 @@ if ( ! class_exists( 'iworks_rate' ) ) {
 					$this->add_months( $plugin_id );
 					wp_send_json_success();
 			}
-
 			wp_send_json_success();
 		}
 
@@ -247,10 +246,13 @@ if ( ! class_exists( 'iworks_rate' ) ) {
 		 *         string $plugin WordPress plugin ID?
 		 */
 		protected function choose_plugin() {
-			$choosen_plugin_id = false;
 			if ( wp_is_mobile() ) {
-				return $choosen_plugin_id;
+				return false;
 			}
+			/**
+			 * list
+			 */
+			$choosen = array();
 			/**
 			 * change time by filter
 			 */
@@ -266,13 +268,13 @@ if ( ! class_exists( 'iworks_rate' ) ) {
 				if ( intval( $item['show_at'] ) > $now ) {
 					continue;
 				}
-				if ( false === $choosen_plugin_id ) {
-					$choosen_plugin_id = $plugin_id;
-				}
+				$choosen[] = $plugin_id;
 			}
-			return $choosen_plugin_id;
+			if ( empty( $choosen ) ) {
+				return false;
+			}
+			return $choosen[ array_rand( $choosen ) ];
 		}
-
 
 		/**
 		 * Renders the actual Notification message.
