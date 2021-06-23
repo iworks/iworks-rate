@@ -2,7 +2,7 @@
 /**
  * iWorks_Rate - Dashboard Notification module.
  *
- * @version 2.0.0
+ * @version 2.0.1
  * @author  iworks (Marcin Pietrzak)
  *
  */
@@ -76,6 +76,11 @@ if ( ! class_exists( 'iworks_rate' ) ) {
 			add_action( 'load-index.php', array( $this, 'load' ) );
 			add_action( 'iworks-register-plugin', array( $this, 'register' ), 5, 3 );
 			add_action( 'wp_ajax_iworks_rate_button', array( $this, 'ajax_button' ) );
+			/**
+			 * own hooks
+			 */
+			add_filter( 'iworks_rate_assistance', array( $this, 'filter_get_assistance_widget' ), 10, 2 );
+			add_filter( 'iworks_rate_love', array( $this, 'filter_get_love_widget' ), 10, 2 );
 		}
 
 		public function load() {
@@ -282,11 +287,28 @@ if ( ! class_exists( 'iworks_rate' ) ) {
 		 * @since  1.0.0
 		 */
 		protected function render_message( $plugin_id ) {
-			$file                = sprintf(
-				'%s/templates/%s.php',
+			$file   = $this->get_file( 'thanks' );
+			$plugin = $this->get_plugin_data_by_plugin_id( $plugin_id );
+			load_template( $file, true, $plugin );
+		}
+
+		/**
+		 * @since 2.0.1
+		 */
+		private function get_file( $file, $group = '' ) {
+			return sprintf(
+				'%s/templates/%s%s%s.php',
 				dirname( __FILE__ ),
-				'thanks'
+				$group,
+				'' === $group ? '' : '/',
+				sanitize_title( $file )
 			);
+		}
+
+		/**
+		 * @since 2.0.1
+		 */
+		private function get_plugin_data_by_plugin_id( $plugin_id ) {
 			$plugin              = wp_parse_args(
 				$this->plugins[ $plugin_id ],
 				$this->stored[ $plugin_id ]
@@ -302,9 +324,68 @@ if ( ! class_exists( 'iworks_rate' ) ) {
 			if ( ! empty( $plugin['logo'] ) ) {
 				$plugin['classes'][] = 'has-logo';
 			}
-			load_template( $file, true, $plugin );
+			$plugin['url']         = esc_url(
+				sprintf(
+					_x( 'https://wordpress.org/plugins/%s/', 'plugins home', 'IWORKS_RATE_TEXTDOMAIN' ),
+					$plugin['slug']
+				)
+			);
+			$plugin['support_url'] = esc_url(
+				sprintf(
+					_x( 'https://wordpress.org/support/plugin/%s/', 'plugins support home', 'IWORKS_RATE_TEXTDOMAIN' ),
+					$plugin['slug']
+				)
+			);
+			return $plugin;
 		}
 
+		/**
+		 * @since 2.0.1
+		 */
+		private function get_plugin_id_by_slug( $slug ) {
+			foreach ( $this->stored as $plugin_id => $plugin ) {
+				if ( $slug === $plugin['slug'] ) {
+					return $plugin_id;
+				}
+			}
+			return new WP_Error();
+		}
+
+		/**
+		 * @since 2.0.1
+		 */
+		public function filter_get_assistance_widget( $content, $slug ) {
+			$plugin_id = $this->get_plugin_id_by_slug( $slug );
+			if ( is_wp_error( $plugin_id ) ) {
+				return $content;
+			}
+			$this->enqueue();
+			$plugin = $this->get_plugin_data_by_plugin_id( $plugin_id );
+			$file   = $this->get_file( 'support', 'widgets' );
+			ob_start();
+			load_template( $file, true, $plugin );
+			$content = ob_get_contents();
+			ob_end_clean();
+			return $content;
+		}
+
+		/**
+		 * @since 2.0.1
+		 */
+		public function filter_get_love_widget( $content, $slug ) {
+			$plugin_id = $this->get_plugin_id_by_slug( $slug );
+			if ( is_wp_error( $plugin_id ) ) {
+				return $content;
+			}
+			$this->enqueue();
+			$plugin = $this->get_plugin_data_by_plugin_id( $plugin_id );
+			$file   = $this->get_file( 'donate', 'widgets' );
+			ob_start();
+			load_template( $file, true, $plugin );
+			$content = ob_get_contents();
+			ob_end_clean();
+			return $content;
+		}
 	}
 
 	// Initialize the module.

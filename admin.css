@@ -35,10 +35,12 @@
   margin-top: -10px;
   padding: 10px 2px;
   overflow: hidden; }
+  .iworks-rate-buttons .iworks-rate-button {
+    float: left;
+    margin: 20px 20px 0 0; }
 
 .iworks-rate-button {
-  float: left;
-  margin: 20px 20px 0 0;
+  margin: 20px auto;
   position: relative;
   display: inline-block;
   min-width: 180px;
@@ -98,5 +100,8 @@
     z-index: -1; }
   .iworks-rate-button:hover:after {
     width: 100%; }
+
+.iworks-rate-center {
+  text-align: center; }
 
 /*# sourceMappingURL=admin.css.map */

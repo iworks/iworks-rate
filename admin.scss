@@ -54,11 +54,14 @@ $color_white: #fff;
     margin-top: -10px;
     padding: 10px 2px;
     overflow: hidden;
+    .iworks-rate-button {
+        float: left;
+        margin: 20px 20px 0 0;
+    }
 }
 
 .iworks-rate-button {
-    float: left;
-    margin: 20px 20px 0 0;
+    margin: 20px auto;
     position: relative;
     display: inline-block;
     min-width: 180px;
@@ -135,5 +138,9 @@ $color_white: #fff;
             width: 100%;
         }
     }
+}
+
+.iworks-rate-center {
+    text-align: center;
 }
 
