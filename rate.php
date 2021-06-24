@@ -76,11 +76,47 @@ if ( ! class_exists( 'iworks_rate' ) ) {
 			add_action( 'load-index.php', array( $this, 'load' ) );
 			add_action( 'iworks-register-plugin', array( $this, 'register' ), 5, 3 );
 			add_action( 'wp_ajax_iworks_rate_button', array( $this, 'ajax_button' ) );
+			add_action( 'admin_init', array( $this, 'admin_init' ) );
 			/**
 			 * own hooks
 			 */
 			add_filter( 'iworks_rate_assistance', array( $this, 'filter_get_assistance_widget' ), 10, 2 );
 			add_filter( 'iworks_rate_love', array( $this, 'filter_get_love_widget' ), 10, 2 );
+		}
+
+		/**
+		 * Inicialize admin area
+		 *
+		 * @since 2.0.2
+		 */
+		public function admin_init() {
+			foreach ( $this->plugins as $plugin_file => $plugin ) {
+				add_filter( 'plugin_action_links_' . $plugin_file, array( $this, 'add_donate_link' ), 10, 4 );
+			}
+		}
+
+		/**
+		 * Add donate link to plugin_row_meta.
+		 *
+		 * @since 2.0.2
+		 *
+		 * @param array  $actions An array of the plugin's metadata, including the version, author, author URI, and plugin URI.
+		 */
+		public function add_donate_link( $actions, $plugin_file, $plugin_data, $context ) {
+			$settings_page_url = esc_url( apply_filters( 'iworks_rate_settings_page_url_' . $plugin_data['slug'], null ) );
+			if ( ! empty( $settings_page_url ) ) {
+				$actions['settings'] = sprintf(
+					'<a href="%s">%s</a>',
+					$settings_page_url,
+					__( 'Settings', 'IWORKS_RATE_TEXTDOMAIN' )
+				);
+			}
+			$actions['donate'] = sprintf(
+				'<a href="https://ko-fi.com/iworks?utm_source=%s&utm_medium=plugin-links" target="_blank">%s</a>',
+				$plugin_data['slug'],
+				__( 'Provide us a coffee', 'IWORKS_RATE_TEXTDOMAIN' )
+			);
+			return $actions;
 		}
 
 		public function load() {
@@ -326,13 +362,13 @@ if ( ! class_exists( 'iworks_rate' ) ) {
 			}
 			$plugin['url']         = esc_url(
 				sprintf(
-					_x( 'https://wordpress.org/plugins/%s/', 'plugins home', 'IWORKS_RATE_TEXTDOMAIN' ),
+					_x( 'https://wordpress.org/plugins/%s', 'plugins home', 'IWORKS_RATE_TEXTDOMAIN' ),
 					$plugin['slug']
 				)
 			);
 			$plugin['support_url'] = esc_url(
 				sprintf(
-					_x( 'https://wordpress.org/support/plugin/%s/', 'plugins support home', 'IWORKS_RATE_TEXTDOMAIN' ),
+					_x( 'https://wordpress.org/support/plugin/%s', 'plugins support home', 'IWORKS_RATE_TEXTDOMAIN' ),
 					$plugin['slug']
 				)
 			);

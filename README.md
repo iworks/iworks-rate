@@ -1,6 +1,5 @@
 # iWorks Rate module #
 
-WPMU DEV Free Dashboard module (short wdev-frash) is used in our free plugins hosted on wordpress.org
 It will display a welcome message upon plugin activation that offers the user a 5-day introduction email course for the plugin. After 7 days the module will display another message asking the user to rate the plugin on wordpress.org
 
 # How to use it #
@@ -69,3 +68,10 @@ function custom_rating_message( $message ) {
     return $message;
 }
 ```
+Changelog
+---------
+
+##### 2.0.2 (2021-06-24)
+* Added "Provide us a coffee" and "Settings" by default.
+
+
