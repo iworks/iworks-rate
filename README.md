@@ -71,6 +71,9 @@ function custom_rating_message( $message ) {
 Changelog
 ---------
 
+##### 2.0.3 (2021-06-29)
+* Fixed urls.
+
 ##### 2.0.2 (2021-06-24)
 * Added "Provide us a coffee" and "Settings" by default.
 
