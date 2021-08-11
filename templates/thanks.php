@@ -23,7 +23,7 @@ echo wpautop( wp_kses_post( sprintf( $content, sprintf( '<a href="%s#faq" target
 		<div class="iworks-rate-buttons">
 			<a data-action="get-help" href="<?php echo $args['support_url']; ?>/#new-post" target="_blank" class="iworks-rate-button iworks-rate-button--green" ><?php echo esc_html( __( 'Get help', 'IWORKS_RATE_TEXTDOMAIN' ) ); ?></a>
 <?php if ( intval( $args['rated'] ) === 0 ) { ?>
-			<a data-action="add-review" href="<?php echo $args['support_url']; ?>reviews/?rate=5#new-post" target="_blank" class="iworks-rate-button iworks-rate-button--green" ><?php echo esc_html( __( 'Add review', 'IWORKS_RATE_TEXTDOMAIN' ) ); ?></a>
+			<a data-action="add-review" href="<?php echo $args['support_url']; ?>/reviews/?rate=5#new-post" target="_blank" class="iworks-rate-button iworks-rate-button--green" ><?php echo esc_html( __( 'Add review', 'IWORKS_RATE_TEXTDOMAIN' ) ); ?></a>
 <?php } ?>
 			<a data-action="donate" href="https://ko-fi.com/iworks/?utm_source=<?php echo $args['slug']; ?>&utm_medium=notice-thanks" target="_blank" class="iworks-rate-button iworks-rate-button--green dashicons-heart" ><?php echo esc_html( __( 'Provide us a coffee', 'IWORKS_RATE_TEXTDOMAIN' ) ); ?></a>
 <?php if ( intval( $args['rated'] ) === 0 ) { ?>
