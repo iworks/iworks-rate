@@ -103,7 +103,14 @@ if ( ! class_exists( 'iworks_rate' ) ) {
 		 * @param array  $actions An array of the plugin's metadata, including the version, author, author URI, and plugin URI.
 		 */
 		public function add_donate_link( $actions, $plugin_file, $plugin_data, $context ) {
-			$settings_page_url = esc_url( apply_filters( 'iworks_rate_settings_page_url_' . $plugin_data['slug'], null ) );
+			$slug = 'iworks';
+			if (
+				isset( $this->plugins[ $plugin_file ] )
+				&& isset( $this->plugins[ $plugin_file ]['slug'] )
+			) {
+				$slug = $this->plugins[ $plugin_file ]['slug'];
+			}
+			$settings_page_url = esc_url( apply_filters( 'iworks_rate_settings_page_url_' . $slug, null ) );
 			if ( ! empty( $settings_page_url ) ) {
 				$actions['settings'] = sprintf(
 					'<a href="%s">%s</a>',
@@ -113,7 +120,7 @@ if ( ! class_exists( 'iworks_rate' ) ) {
 			}
 			$actions['donate'] = sprintf(
 				'<a href="https://ko-fi.com/iworks?utm_source=%s&utm_medium=plugin-links" target="_blank">%s</a>',
-				$plugin_data['slug'],
+				$slug,
 				__( 'Provide us a coffee', 'IWORKS_RATE_TEXTDOMAIN' )
 			);
 			return $actions;

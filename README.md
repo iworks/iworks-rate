@@ -71,9 +71,11 @@ function custom_rating_message( $message ) {
 Changelog
 ---------
 
+##### 2.0.5 (2021-12-20)
+* Fixed settigns page url (depend on plugin slug).
+
 ##### 2.0.4 (2021-08-11)
 * Fixed review url.
-
 
 ##### 2.0.3 (2021-06-29)
 * Fixed urls.
