@@ -24,52 +24,24 @@ include_once 'vendor/iworks/rate/rate.php';
 
 // Register the current plugin.
 do_action(
-	'wdev-register-plugin',
-	/* 1             Plugin ID */ plugin_basename( __FILE__ ),
-	/* 2          Plugin Title */ 'Sierotki',            
-	/* 3 https://wordpress.org */ '/plugins/membership/',
-	/* 4      Email Button CTA */ __( 'Get Members!', MYD_TEXT_DOMAIN ),  
-	/* 5  getdrip Plugin param */ 'Membership'
+	'iworks-register-plugin',
+    /* plugin ID    */ plugin_basename( __FILE__ ),
+    /* Plugin Title */ __( 'iWorks PWA', 'iworks-pwa' ),
+    /* Plugin slug  */ 'iworks-pwa'
 );
 // All done!
 ```
 
 1. Always same, do not change
-2. The plugin title, same as in the plugin header (no translation!)
-3. The wordpress.org plugin-URL
-4. Optional: Title of the Email-subscription button. If empty no email message is displayed.
-5. Optional: getdrip plugin name (defined in the getdrip rule). If empty no email message is displayed
+2. The plugin title.
+3. The plugin slug.
 
 
-## Optional: Customize the messages via filters ##
-
-```
-<?php
-// The email message contains 1 variable: plugin-name
-add_filter(
-    'wdev-email-message-' . plugin_basename( __FILE__ ),
-    'custom_email_message'
-);
-function custom_email_message( $message ) {
-    $message = 'You installed %s! This is a custom <u>email message</u>';
-    return $message;
-}
-```
-
-```
-<?php
-// The rating message contains 2 variables: user-name, plugin-name
-add_filter(
-    'wdev-rating-message-' . plugin_basename( __FILE__ ),
-    'custom_rating_message'
-);
-function custom_rating_message( $message ) {
-    $message = 'Hi %s, you used %s for a while now! This is a custom <u>rating message</u>';
-    return $message;
-}
-```
 Changelog
 ---------
+
+##### 2.0.6 (2022-01-18)
+* Added ability to change slug and title during `iworks-register-plugin`.
 
 ##### 2.0.5 (2021-12-20)
 * Fixed settigns page url (depend on plugin slug).

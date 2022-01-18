@@ -2,7 +2,7 @@
 /**
  * iWorks_Rate - Dashboard Notification module.
  *
- * @version 2.0.5
+ * @version 2.0.6
  * @author  iworks (Marcin Pietrzak)
  *
  */
@@ -15,7 +15,7 @@ if ( ! class_exists( 'iworks_rate' ) ) {
 		 * @since 1.0.1
 		 * @var   string
 		 */
-		private $version = '2.0.5';
+		private $version = '2.0.6';
 
 		/**
 		 * $wpdb->options field name.
@@ -164,6 +164,13 @@ if ( ! class_exists( 'iworks_rate' ) ) {
 				'slug'  => $slug,
 			);
 			$this->plugins[ $plugin_id ] = $data;
+			/**
+			 * check for option update
+			 *
+			 * @since 2.0.6
+			 *
+			 */
+			$update = false;
 			/*
 			 * When the plugin is registered the first time we store some infos
 			 * in the persistent module-data that help us later to find out
@@ -179,7 +186,27 @@ if ( ! class_exists( 'iworks_rate' ) ) {
 					),
 					$data
 				);
-				// Finally save the details.
+				$update                     = true;
+			}
+			/**
+			 * check slug & mark for update if needed
+			 *
+			 * @since 2.0.6
+			 */
+			if ( $this->stored[ $plugin_id ]['slug'] !== $slug ) {
+				$this->stored[ $plugin_id ]['slug'] = $slug;
+				$update                             = true;
+			}
+			/**
+			 * check title - can be diferent due language
+			 *
+			 * @since 2.0.6
+			 */
+			$this->stored[ $plugin_id ]['title'] = $title;
+			/**
+			 * Finally save the details if it is needed
+			 */
+			if ( $update ) {
 				$this->store_data();
 			}
 		}
