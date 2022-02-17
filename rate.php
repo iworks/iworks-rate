@@ -474,7 +474,7 @@ if ( ! class_exists( 'iworks_rate' ) ) {
 					'title'    => __( 'OpenGraph', 'IWORKS_RATE_TEXTDOMAIN' ),
 					'callback' => array( $this, 'get_advertising_og_content' ),
 					'context'  => 'side',
-					'priority' => 'high',
+					'priority' => 'low',
 				),
 			);
 		}
