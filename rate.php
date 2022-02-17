@@ -2,7 +2,7 @@
 /**
  * iWorks_Rate - Dashboard Notification module.
  *
- * @version 2.0.6
+ * @version 2.1.0
  * @author  iworks (Marcin Pietrzak)
  *
  */
@@ -15,7 +15,7 @@ if ( ! class_exists( 'iworks_rate' ) ) {
 		 * @since 1.0.1
 		 * @var   string
 		 */
-		private $version = '2.0.6';
+		private $version = '2.1.0';
 
 		/**
 		 * $wpdb->options field name.
@@ -82,6 +82,12 @@ if ( ! class_exists( 'iworks_rate' ) ) {
 			 */
 			add_filter( 'iworks_rate_assistance', array( $this, 'filter_get_assistance_widget' ), 10, 2 );
 			add_filter( 'iworks_rate_love', array( $this, 'filter_get_love_widget' ), 10, 2 );
+			/**
+			 * advertising
+			 *
+			 * @since 2.1.0
+			 */
+			add_filter( 'iworks_rate_advertising_og', array( $this, 'filter_get_advertising_og' ) );
 		}
 
 		/**
@@ -456,6 +462,47 @@ if ( ! class_exists( 'iworks_rate' ) ) {
 			ob_end_clean();
 			return $content;
 		}
+
+		/**
+		 * Get advertising for "OG — Better Share on Social Media" plugin.
+		 *
+		 * @since 2.1.0
+		 */
+		public function filter_get_advertising_og( $data ) {
+			return array(
+				'iworks-adverting-og' => array(
+					'title'    => __( 'OpenGraph', 'IWORKS_RATE_TEXTDOMAIN' ),
+					'callback' => array( $this, 'get_advertising_og_content' ),
+					'context'  => 'side',
+					'priority' => 'high',
+				),
+			);
+		}
+
+		/**
+		 * Advertising content for "OG — Better Share on Social Media" plugin.
+		 *
+		 * @since 2.1.0
+		 */
+		public function get_advertising_og_content() {
+			$args = array(
+				'install_plugin_url' => $this->get_install_plugin_url( 'og' ),
+				'plugin_name'        => __( 'OG — Better Share on Social Media', 'IWORKS_RATE_TEXTDOMAIN' ),
+				'plugin_wp_home'     => __( 'https://wordpress.org/plugins/og/', 'IWORKS_RATE_TEXTDOMAIN' ),
+			);
+			$file = $this->get_file( 'og', 'plugins' );
+			load_template( $file, true, $args );
+		}
+
+		/**
+		 * get admin plugin install url
+		 *
+		 * @since 2.1.0
+		 */
+		private function get_install_plugin_url( $slug ) {
+			return wp_nonce_url( self_admin_url( 'update.php?action=install-plugin&plugin=' . $slug ), 'install-plugin_' . $slug );
+		}
+
 	}
 
 	// Initialize the module.

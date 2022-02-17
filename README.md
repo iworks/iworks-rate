@@ -40,6 +40,9 @@ do_action(
 Changelog
 ---------
 
+##### 2.1.0 (2022-02-17)
+* Added ability to show "OG — Better Share on Social Media" plugin install proposal.
+
 ##### 2.0.6 (2022-01-18)
 * Added ability to change slug and title during `iworks-register-plugin`.
 
