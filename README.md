@@ -40,6 +40,11 @@ do_action(
 Changelog
 ---------
 
+##### 2.1.1 (2022-09-01)
+* Replced `FILTER_SANITIZE_STRING` by `FILTER_DEFAULT` to avoid PHP 8x warnings.
+* Significant increase in sleep time for showing banners.
+* Reduced size of `iworks-logo.svg` file.
+
 ##### 2.1.0 (2022-02-17)
 * Added ability to show "OG — Better Share on Social Media" plugin install proposal.
 

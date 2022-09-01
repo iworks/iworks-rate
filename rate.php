@@ -2,7 +2,7 @@
 /**
  * iWorks_Rate - Dashboard Notification module.
  *
- * @version 2.1.0
+ * @version 2.1.1
  * @author  iworks (Marcin Pietrzak)
  *
  */
@@ -15,7 +15,7 @@ if ( ! class_exists( 'iworks_rate' ) ) {
 		 * @since 1.0.1
 		 * @var   string
 		 */
-		private $version = '2.1.0';
+		private $version = '2.1.1';
 
 		/**
 		 * $wpdb->options field name.
@@ -223,14 +223,14 @@ if ( ! class_exists( 'iworks_rate' ) ) {
 		 * @since  1.0.0
 		 */
 		public function ajax_button() {
-			$plugin_id = filter_input( INPUT_POST, 'plugin_id', FILTER_SANITIZE_STRING );
+			$plugin_id = filter_input( INPUT_POST, 'plugin_id', FILTER_DEFAULT );
 			if ( empty( $plugin_id ) ) {
 				wp_send_json_error();
 			}
 			if ( ! isset( $this->plugins[ $plugin_id ] ) ) {
 				wp_send_json_error();
 			}
-			switch ( filter_input( INPUT_POST, 'button', FILTER_SANITIZE_STRING ) ) {
+			switch ( filter_input( INPUT_POST, 'button', FILTER_DEFAULT ) ) {
 				case '':
 				case 'add-review':
 					$this->add_weeks( $plugin_id );
@@ -258,7 +258,7 @@ if ( ! class_exists( 'iworks_rate' ) ) {
 			if ( ! isset( $this->stored[ $plugin_id ] ) ) {
 				return;
 			}
-			$this->stored[ $plugin_id ]['show_at'] = time() + rand( 2, 3 ) * WEEK_IN_SECONDS + rand( 0, 3 ) * DAY_IN_SECONDS;
+			$this->stored[ $plugin_id ]['show_at'] = time() + rand( 4, 6 ) * WEEK_IN_SECONDS + rand( 0, 7 ) * DAY_IN_SECONDS;
 			$this->store_data();
 		}
 
@@ -266,7 +266,7 @@ if ( ! class_exists( 'iworks_rate' ) ) {
 			if ( ! isset( $this->stored[ $plugin_id ] ) ) {
 				return;
 			}
-			$this->stored[ $plugin_id ]['show_at'] = time() + rand( 10, 15 ) * WEEK_IN_SECONDS + rand( 0, 7 ) * DAY_IN_SECONDS;
+			$this->stored[ $plugin_id ]['show_at'] = time() + rand( 15, 30 ) * WEEK_IN_SECONDS + rand( 0, 14 ) * DAY_IN_SECONDS;
 			$this->store_data();
 		}
 
