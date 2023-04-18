@@ -40,6 +40,9 @@ do_action(
 Changelog
 ---------
 
+##### 2.1.2 (2023-03-18)
+* A problem with escaping empty strings has been resolved.
+
 ##### 2.1.1 (2022-09-01)
 * Replced `FILTER_SANITIZE_STRING` by `FILTER_DEFAULT` to avoid PHP 8x warnings.
 * Significant increase in sleep time for showing banners.

@@ -2,7 +2,7 @@
 /**
  * iWorks_Rate - Dashboard Notification module.
  *
- * @version 2.1.1
+ * @version 2.1.2
  * @author  iworks (Marcin Pietrzak)
  *
  */
@@ -15,7 +15,7 @@ if ( ! class_exists( 'iworks_rate' ) ) {
 		 * @since 1.0.1
 		 * @var   string
 		 */
-		private $version = '2.1.1';
+		private $version = '2.1.2';
 
 		/**
 		 * $wpdb->options field name.
@@ -116,11 +116,11 @@ if ( ! class_exists( 'iworks_rate' ) ) {
 			) {
 				$slug = $this->plugins[ $plugin_file ]['slug'];
 			}
-			$settings_page_url = esc_url( apply_filters( 'iworks_rate_settings_page_url_' . $slug, null ) );
+			$settings_page_url = apply_filters( 'iworks_rate_settings_page_url_' . $slug, null );
 			if ( ! empty( $settings_page_url ) ) {
 				$actions['settings'] = sprintf(
 					'<a href="%s">%s</a>',
-					$settings_page_url,
+					esc_url( $settings_page_url ),
 					__( 'Settings', 'IWORKS_RATE_TEXTDOMAIN' )
 				);
 			}
