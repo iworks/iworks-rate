@@ -1,4 +1,5 @@
 <?php
+defined( 'ABSPATH' ) || exit; // Exit if accessed directly
 /**
  * iWorks_Rate - Dashboard Notification module.
  *
@@ -121,13 +122,21 @@ if ( ! class_exists( 'iworks_rate' ) ) {
 				$actions['settings'] = sprintf(
 					'<a href="%s">%s</a>',
 					esc_url( $settings_page_url ),
-					__( 'Settings', 'IWORKS_RATE_TEXTDOMAIN' )
+					esc_html__( 'Settings', 'IWORKS_RATE_TEXTDOMAIN' )
 				);
 			}
 			$actions['donate'] = sprintf(
-				'<a href="https://ko-fi.com/iworks?utm_source=%s&utm_medium=plugin-links" target="_blank">%s</a>',
-				$slug,
-				__( 'Provide us a coffee', 'IWORKS_RATE_TEXTDOMAIN' )
+				'<a href="%s" target="_blank">%s</a>',
+				esc_url(
+					add_query_arg(
+						array(
+							'utm_source' => $slug,
+							'utm_medium' => 'plugin-links',
+						),
+						'https://ko-fi.com/iworks'
+					)
+				),
+				esc_html__( 'Provide us a coffee', 'IWORKS_RATE_TEXTDOMAIN' )
 			);
 			return $actions;
 		}
@@ -227,10 +236,25 @@ if ( ! class_exists( 'iworks_rate' ) ) {
 			if ( empty( $plugin_id ) ) {
 				wp_send_json_error();
 			}
+			/**
+			 * sanitize plugin_id
+			 *
+			 * @since 2.1.3
+			 */
+			$plugin_id = sanitize_text_field( $plugin_id );
 			if ( ! isset( $this->plugins[ $plugin_id ] ) ) {
 				wp_send_json_error();
 			}
-			switch ( filter_input( INPUT_POST, 'button', FILTER_DEFAULT ) ) {
+			/**
+			 * sanitize button value
+			 *
+			 * @since 2.1.3
+			 */
+			$value = '';
+			if ( isset( $_POST['button'] ) ) {
+				$value = sanitize_text_field( filter_input( INPUT_POST, 'button', FILTER_DEFAULT ) );
+			}
+			switch ( $value ) {
 				case '':
 				case 'add-review':
 					$this->add_weeks( $plugin_id );

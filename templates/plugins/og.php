@@ -1,6 +1,11 @@
-<p><?php
+<?php
+defined( 'ABSPATH' ) || exit; // Exit if accessed directly
+?>
+<p>
+<?php
 	esc_html_e( 'Would you like to boost your website sharing abilities?', 'IWORKS_RATE_TEXTDOMAIN ' );
-?></p>
+?>
+</p>
 <p>
 <?php
 printf(

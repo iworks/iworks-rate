@@ -40,6 +40,9 @@ do_action(
 Changelog
 ---------
 
+##### 2.1.3 (2023-10-13)
+* Data input sanitization has been added.
+
 ##### 2.1.2 (2023-03-18)
 * A problem with escaping empty strings has been resolved.
 
