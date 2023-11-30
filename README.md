@@ -40,10 +40,11 @@ do_action(
 Changelog
 ---------
 
-##### 2.1.4 (2023-xx-xx)
-* The function `rand()` has been replaced by the function `wp_rand()`.
-* The defnition of class propery hass been added to avoid deprecated message about creation of dynamic property in PHP 8.2.
+##### 2.1.4 (2023-11-30)
 * Checking nonce for dashbord actions has been added.
+* Data input sanitization has been added.
+* The defnition of class propery hass been added to avoid deprecated message about creation of dynamic property in PHP 8.2.
+* The function `rand()` has been replaced by the function `wp_rand()`.
 
 ##### 2.1.3 (2023-10-13)
 * Data input sanitization has been added.

@@ -443,14 +443,16 @@ if ( ! class_exists( 'iworks_rate' ) ) {
 			if ( ! empty( $plugin['logo'] ) ) {
 				$plugin['classes'][] = 'has-logo';
 			}
-			$plugin['url']         = esc_url(
+			$plugin['url'] = esc_url(
 				sprintf(
+				/* translators: %s: plugin slug */
 					_x( 'https://wordpress.org/plugins/%s', 'plugins home', 'IWORKS_RATE_TEXTDOMAIN' ),
 					$plugin['slug']
 				)
 			);
 			$plugin['support_url'] = esc_url(
 				sprintf(
+					/* translators: %s: plugin slug */
 					_x( 'https://wordpress.org/support/plugin/%s', 'plugins support home', 'IWORKS_RATE_TEXTDOMAIN' ),
 					$plugin['slug']
 				)
