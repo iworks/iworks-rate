@@ -5,7 +5,8 @@ jQuery(
             var data = {
                 action: 'iworks_rate_button',
                 plugin_id: $parent.data('id'),
-                button: jQuery(this).data('action')
+                button: jQuery(this).data('action'),
+                _wpnonce: $parent.data('nonce')
             };
             if ('get-help' === jQuery(this).data('action')) {
                 return true;

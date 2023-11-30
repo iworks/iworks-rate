@@ -46,6 +46,14 @@ if ( ! class_exists( 'iworks_rate' ) ) {
 		protected $stored = array();
 
 		/**
+		 * The Plugin ID
+		 *
+		 * @since 2.1.4
+		 * @var   string
+		 */
+		private $plugin_id;
+
+		/**
 		 * Initializes and returns the singleton instance.
 		 *
 		 * @since  1.0.0
@@ -195,7 +203,7 @@ if ( ! class_exists( 'iworks_rate' ) ) {
 				$this->stored[ $plugin_id ] = wp_parse_args(
 					array(
 						'registered' => time(),
-						'show_at'    => time() + rand( 7, 14 ) * DAY_IN_SECONDS,
+						'show_at'    => time() + wp_rand( 7, 14 ) * DAY_IN_SECONDS,
 						'rated'      => 0,
 						'hide'       => 0,
 					),
@@ -232,6 +240,17 @@ if ( ! class_exists( 'iworks_rate' ) ) {
 		 * @since  1.0.0
 		 */
 		public function ajax_button() {
+			/**
+			 * Chekc nonce
+			 *
+			 * @since 2.1.4
+			 */
+			if ( ! check_ajax_referer( 'iworks-rate' ) ) {
+				wp_send_json_error();
+			}
+			/**
+			 * get plugin ID
+			 */
 			$plugin_id = filter_input( INPUT_POST, 'plugin_id', FILTER_DEFAULT );
 			if ( empty( $plugin_id ) ) {
 				wp_send_json_error();
@@ -282,7 +301,7 @@ if ( ! class_exists( 'iworks_rate' ) ) {
 			if ( ! isset( $this->stored[ $plugin_id ] ) ) {
 				return;
 			}
-			$this->stored[ $plugin_id ]['show_at'] = time() + rand( 4, 6 ) * WEEK_IN_SECONDS + rand( 0, 7 ) * DAY_IN_SECONDS;
+			$this->stored[ $plugin_id ]['show_at'] = time() + wp_rand( 4, 6 ) * WEEK_IN_SECONDS + wp_rand( 0, 7 ) * DAY_IN_SECONDS;
 			$this->store_data();
 		}
 
@@ -290,7 +309,7 @@ if ( ! class_exists( 'iworks_rate' ) ) {
 			if ( ! isset( $this->stored[ $plugin_id ] ) ) {
 				return;
 			}
-			$this->stored[ $plugin_id ]['show_at'] = time() + rand( 15, 30 ) * WEEK_IN_SECONDS + rand( 0, 14 ) * DAY_IN_SECONDS;
+			$this->stored[ $plugin_id ]['show_at'] = time() + wp_rand( 15, 30 ) * WEEK_IN_SECONDS + wp_rand( 0, 14 ) * DAY_IN_SECONDS;
 			$this->store_data();
 		}
 

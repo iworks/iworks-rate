@@ -8,6 +8,7 @@ defined( 'ABSPATH' ) || exit; // Exit if accessed directly
 	data-slug="<?php echo esc_attr( $args['slug'] ); ?>"
 	data-id="<?php echo esc_attr( $args['plugin_id'] ); ?>"
 	data-ajax-url="<?php echo esc_url( $args['ajax_url'] ); ?>"
+	data-nonce="<?php echo wp_create_nonce( 'iworks-rate' ); ?>"
 >
 	<div class="<?php echo esc_attr( implode( ' ', $args['classes'] ) ); ?>">
 		<h4>
