@@ -251,6 +251,10 @@ if ( ! class_exists( 'iworks_rate' ) ) {
 			/**
 			 * get plugin ID
 			 */
+			$nonce_value = filter_input( INPUT_POST, '_wpnonce', FILTER_DEFAULT );
+			if ( ! wp_verify_nonce( $nonce_value, 'iworks-rate' ) ) {
+				wp_send_json_error();
+			}
 			$plugin_id = filter_input( INPUT_POST, 'plugin_id', FILTER_DEFAULT );
 			if ( empty( $plugin_id ) ) {
 				wp_send_json_error();
@@ -457,7 +461,25 @@ if ( ! class_exists( 'iworks_rate' ) ) {
 					$plugin['slug']
 				)
 			);
-			return $plugin;
+			/**
+			 * Change plugin data.
+			 *
+			 * Allows to change generated plugin data.
+			 *
+			 * @since 2.1.4
+			 *
+			 * @param array $plugin {
+			 *     Plugin data.
+			 *
+			 *     @type string $plugin_id Plugin ID
+			 *     @type string $logo Logo URL
+			 *     @type string $ajax_url Admin AJAX URl
+			 *     @type array $classes CSS classes
+			 *     @type string $url Plugin repository URL
+			 *     @type string $support_url Plugin support URL
+			 * }
+			 */
+			return apply_filters( 'iworks_rate_plugin_data', $plugin );
 		}
 
 		/**
