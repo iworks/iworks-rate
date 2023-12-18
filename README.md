@@ -40,6 +40,9 @@ do_action(
 Changelog
 ---------
 
+##### 2.1.5 (2023-12-17)
+* Usage of the `wp_rand()` function has been improved.
+
 ##### 2.1.4 (2023-11-30)
 * Checking nonce for dashbord actions has been added.
 * Data input sanitization has been added.

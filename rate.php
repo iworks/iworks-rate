@@ -203,7 +203,7 @@ if ( ! class_exists( 'iworks_rate' ) ) {
 				$this->stored[ $plugin_id ] = wp_parse_args(
 					array(
 						'registered' => time(),
-						'show_at'    => time() + wp_rand( 7, 14 ) * DAY_IN_SECONDS,
+						'show_at'    => $this->get_random_future_timestamp( 7, 14 ),
 						'rated'      => 0,
 						'hide'       => 0,
 					),
@@ -301,7 +301,7 @@ if ( ! class_exists( 'iworks_rate' ) ) {
 			if ( ! isset( $this->stored[ $plugin_id ] ) ) {
 				return;
 			}
-			$this->stored[ $plugin_id ]['show_at'] = time() + wp_rand( 4, 6 ) * WEEK_IN_SECONDS + wp_rand( 0, 7 ) * DAY_IN_SECONDS;
+			$this->stored[ $plugin_id ]['show_at'] = $this->get_random_future_timestamp( 0, 7, 4, 6 );
 			$this->store_data();
 		}
 
@@ -309,7 +309,7 @@ if ( ! class_exists( 'iworks_rate' ) ) {
 			if ( ! isset( $this->stored[ $plugin_id ] ) ) {
 				return;
 			}
-			$this->stored[ $plugin_id ]['show_at'] = time() + wp_rand( 15, 30 ) * WEEK_IN_SECONDS + wp_rand( 0, 14 ) * DAY_IN_SECONDS;
+			$this->stored[ $plugin_id ]['show_at'] = $this->get_random_future_timestamp( 0, 14, 15, 30 );
 			$this->store_data();
 		}
 
@@ -546,6 +546,43 @@ if ( ! class_exists( 'iworks_rate' ) ) {
 		 */
 		private function get_install_plugin_url( $slug ) {
 			return wp_nonce_url( self_admin_url( 'update.php?action=install-plugin&plugin=' . $slug ), 'install-plugin_' . $slug );
+		}
+
+		/**
+		 * Get random future timstamp
+		 *
+		 * @since 2.1.5
+		 */
+		private function get_random_future_timestamp( $day_min = 0, $day_max = 0, $week_min = 0, $week_max = 0 ) {
+			$time = time();
+			/**
+			 * DAY_IN_SECONDS
+			 */
+			$days = 0;
+			if ( 0 < $day_max ) {
+				if ( function_exists( 'wp_rand' ) ) {
+					$days = wp_rand( $min, $max );
+				} else {
+					$days = rand( $min, $max );
+				}
+			}
+			$time += $days * DAY_IN_SECONDS;
+			/**
+			 * WEEK_IN_SECONDS
+			 */
+			$weeks = 0;
+			if ( 0 < $week_max ) {
+				if ( function_exists( 'wp_rand' ) ) {
+					$weeks = wp_rand( $min, $max );
+				} else {
+					$weeks = rand( $min, $max );
+				}
+			}
+			$time += $weeks * WEEK_IN_SECONDS;
+			/**
+			 * returns
+			 */
+			return $time;
 		}
 
 	}
