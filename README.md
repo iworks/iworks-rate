@@ -40,6 +40,9 @@ do_action(
 Changelog
 ---------
 
+##### 2.1.7 (2024-01-16)
+* Typo in text domain has been fixed.
+
 ##### 2.1.6 (2023-12-18)
 * Usage of the `wp_rand()` function has been improved.
 
