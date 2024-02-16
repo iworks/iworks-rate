@@ -40,6 +40,9 @@ do_action(
 Changelog
 ---------
 
+##### 2.1.8 (2024-02-16)
+* Min/max values have been fixed.
+
 ##### 2.1.7 (2024-01-16)
 * Typo in text domain has been fixed.
 

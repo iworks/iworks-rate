@@ -3,7 +3,7 @@ defined( 'ABSPATH' ) || exit; // Exit if accessed directly
 /**
  * iWorks_Rate - Dashboard Notification module.
  *
- * @version 2.1.7
+ * @version 2.1.8
  * @author  iworks (Marcin Pietrzak)
  *
  */
@@ -16,7 +16,7 @@ if ( ! class_exists( 'iworks_rate' ) ) {
 		 * @since 1.0.1
 		 * @var   string
 		 */
-		private $version = '2.1.7';
+		private $version = '2.1.8';
 
 		/**
 		 * $wpdb->options field name.
@@ -182,10 +182,16 @@ if ( ! class_exists( 'iworks_rate' ) ) {
 			if ( empty( $plugin_id ) || empty( $title ) || empty( $slug ) ) {
 				return;
 			}
-			$data                        = array(
+			/**
+			 * collect data
+			 */
+			$data = array(
 				'title' => $title,
 				'slug'  => $slug,
 			);
+			/**
+			 * add dat to plugins array
+			 */
 			$this->plugins[ $plugin_id ] = $data;
 			/**
 			 * check for option update
@@ -567,7 +573,18 @@ if ( ! class_exists( 'iworks_rate' ) ) {
 		 * @since 2.1.0
 		 */
 		private function get_install_plugin_url( $slug ) {
-			return wp_nonce_url( self_admin_url( 'update.php?action=install-plugin&plugin=' . $slug ), 'install-plugin_' . $slug );
+			return wp_nonce_url(
+				self_admin_url(
+					add_query_arg(
+						array(
+							'action' => 'install-plugin',
+							'plugin' => $slug,
+						),
+						'update.php'
+					)
+				),
+				'install-plugin_' . $slug
+			);
 		}
 
 		/**
@@ -583,9 +600,9 @@ if ( ! class_exists( 'iworks_rate' ) ) {
 			$days = 0;
 			if ( 0 < $day_max ) {
 				if ( function_exists( 'wp_rand' ) ) {
-					$days = wp_rand( $min, $max );
+					$days = wp_rand( $day_min, $day_max );
 				} else {
-					$days = rand( $min, $max );
+					$days = rand( $day_min, $day_max );
 				}
 			}
 			$time += $days * DAY_IN_SECONDS;
@@ -595,9 +612,9 @@ if ( ! class_exists( 'iworks_rate' ) ) {
 			$weeks = 0;
 			if ( 0 < $week_max ) {
 				if ( function_exists( 'wp_rand' ) ) {
-					$weeks = wp_rand( $min, $max );
+					$weeks = wp_rand( $week_min, $week_max );
 				} else {
-					$weeks = rand( $min, $max );
+					$weeks = rand( $week_min, $week_max );
 				}
 			}
 			$time += $weeks * WEEK_IN_SECONDS;
@@ -606,7 +623,6 @@ if ( ! class_exists( 'iworks_rate' ) ) {
 			 */
 			return $time;
 		}
-
 	}
 
 	// Initialize the module.
