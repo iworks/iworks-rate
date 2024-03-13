@@ -40,6 +40,9 @@ do_action(
 Changelog
 ---------
 
+##### 2.1.9 (2024-03-13)
+* The `rand()` function has been removed.
+
 ##### 2.1.8 (2024-02-16)
 * Min/max values have been fixed.
 

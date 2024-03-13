@@ -3,7 +3,7 @@ defined( 'ABSPATH' ) || exit; // Exit if accessed directly
 /**
  * iWorks_Rate - Dashboard Notification module.
  *
- * @version 2.1.8
+ * @version 2.1.9
  * @author  iworks (Marcin Pietrzak)
  *
  */
@@ -16,7 +16,7 @@ if ( ! class_exists( 'iworks_rate' ) ) {
 		 * @since 1.0.1
 		 * @var   string
 		 */
-		private $version = '2.1.8';
+		private $version = '2.1.9';
 
 		/**
 		 * $wpdb->options field name.
@@ -599,11 +599,7 @@ if ( ! class_exists( 'iworks_rate' ) ) {
 			 */
 			$days = 0;
 			if ( 0 < $day_max ) {
-				if ( function_exists( 'wp_rand' ) ) {
-					$days = wp_rand( $day_min, $day_max );
-				} else {
-					$days = rand( $day_min, $day_max );
-				}
+				$days = wp_rand( $day_min, $day_max );
 			}
 			$time += $days * DAY_IN_SECONDS;
 			/**
@@ -611,11 +607,7 @@ if ( ! class_exists( 'iworks_rate' ) ) {
 			 */
 			$weeks = 0;
 			if ( 0 < $week_max ) {
-				if ( function_exists( 'wp_rand' ) ) {
-					$weeks = wp_rand( $week_min, $week_max );
-				} else {
-					$weeks = rand( $week_min, $week_max );
-				}
+				$weeks = wp_rand( $week_min, $week_max );
 			}
 			$time += $weeks * WEEK_IN_SECONDS;
 			/**
