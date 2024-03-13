@@ -42,6 +42,7 @@ Changelog
 
 ##### 2.1.9 (2024-03-13)
 * The `rand()` function has been removed.
+* Escaping were been added to templates.
 
 ##### 2.1.8 (2024-02-16)
 * Min/max values have been fixed.

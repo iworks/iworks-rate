@@ -76,7 +76,7 @@ if ( ! class_exists( 'iworks_rate' ) ) {
 			 * settings
 			 */
 			$this->stored = wp_parse_args(
-				get_site_option( $this->option_name, false, false ),
+				get_site_option( $this->option_name, false ),
 				array()
 			);
 			/**
