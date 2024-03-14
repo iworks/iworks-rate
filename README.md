@@ -40,6 +40,9 @@ do_action(
 Changelog
 ---------
 
+##### 2.2.0 (2024-xx-xx)
+* Escaping were been added to templates.
+
 ##### 2.1.9 (2024-03-13)
 * The `rand()` function has been removed.
 * Escaping were been added to templates.
