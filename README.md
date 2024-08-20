@@ -40,8 +40,9 @@ do_action(
 Changelog
 ---------
 
-##### 2.2.0 (2024-xx-xx)
+##### 2.2.0 (2024-08-20)
 * Escaping were been added to templates.
+* WP function `wp_rand` has been copied to avoid to early calling.
 
 ##### 2.1.9 (2024-03-13)
 * The `rand()` function has been removed.
