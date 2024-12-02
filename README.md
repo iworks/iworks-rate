@@ -40,6 +40,9 @@ do_action(
 Changelog
 ---------
 
+##### 2.2.1 (2024-12-02)
+* Cheking for registered plugin has been added.
+
 ##### 2.2.0 (2024-08-20)
 * Escaping were been added to templates.
 * WP function `wp_rand` has been copied to avoid to early calling.
