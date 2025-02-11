@@ -441,8 +441,8 @@ if ( ! class_exists( 'iworks_rate' ) ) {
 			if ( ! isset( $this->plugins[ $plugin_id ] ) ) {
 				return new WP_Error(
 					'no-plugin',
-					/* translators: %s: plugin id */
 					sprintf(
+						/* translators: %s: plugin id */
 						esc_html__( 'There is no plugin with id: %s.', 'IWORKS_RATE_TEXTDOMAIN' ),
 						$plugin_id
 					)
