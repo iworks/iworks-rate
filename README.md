@@ -40,8 +40,11 @@ do_action(
 Changelog
 ---------
 
+##### 2.2.2 (2025-02-11)
+* The `sanitize_text_field` has been added.
+
 ##### 2.2.1 (2024-12-02)
-* Cheking for registered plugin has been added.
+* Checking for registered plugin has been added.
 
 ##### 2.2.0 (2024-08-20)
 * Escaping were been added to templates.

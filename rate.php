@@ -3,7 +3,7 @@ defined( 'ABSPATH' ) || exit; // Exit if accessed directly
 /**
  * iWorks_Rate - Dashboard Notification module.
  *
- * @version 2.2.1
+ * @version 2.2.2
  * @author  iworks (Marcin Pietrzak)
  *
  */
@@ -16,7 +16,7 @@ if ( ! class_exists( 'iworks_rate' ) ) {
 		 * @since 1.0.1
 		 * @var   string
 		 */
-		private $version = '2.2.1';
+		private $version = '2.2.2';
 
 		/**
 		 * $wpdb->options field name.
@@ -257,11 +257,11 @@ if ( ! class_exists( 'iworks_rate' ) ) {
 			/**
 			 * get plugin ID
 			 */
-			$nonce_value = filter_input( INPUT_POST, '_wpnonce', FILTER_DEFAULT );
+			$nonce_value = sanitize_text_field( filter_input( INPUT_POST, '_wpnonce', FILTER_DEFAULT ) );
 			if ( ! wp_verify_nonce( $nonce_value, 'iworks-rate' ) ) {
 				wp_send_json_error();
 			}
-			$plugin_id = filter_input( INPUT_POST, 'plugin_id', FILTER_DEFAULT );
+			$plugin_id = sanitize_text_field( filter_input( INPUT_POST, 'plugin_id', FILTER_DEFAULT ) );
 			if ( empty( $plugin_id ) ) {
 				wp_send_json_error();
 			}
