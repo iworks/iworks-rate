@@ -40,6 +40,9 @@ do_action(
 Changelog
 ---------
 
+##### 2.2.3 (2025-02-12)
+* The `wp_rand()` and fallback `mt_rand()` functions have been added.
+
 ##### 2.2.2 (2025-02-11)
 * The `sanitize_text_field` has been added.
 
