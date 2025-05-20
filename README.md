@@ -40,6 +40,18 @@ do_action(
 Changelog
 ---------
 
+##### 2.3.0 (2025-05-20)
+* Added: Anniversary notification system to celebrate plugin usage milestones. [#1](https://github.com/iworks/rate/issues/1)
+* Added: New template system for anniversary messages with first-year and subsequent year variations.
+* Added: `show_anniversary()` method to handle anniversary-specific notifications.
+* Added: `hide_anniversary()` method to manage anniversary notice dismissal.
+* Added: Support for tracking and displaying plugin usage anniversaries.
+* Added: Custom UTM parameters for anniversary-related donation links.
+* Updated: Modified `render_message()` to support custom template groups.
+* Updated: Enhanced admin.js to handle anniversary-specific actions.
+* Updated: Added new template files for anniversary messages.
+* Fixed: Improved donation link handling with proper UTM parameters.
+
 ##### 2.2.3 (2025-02-12)
 * The `wp_rand()` and fallback `mt_rand()` functions have been added.
 
@@ -104,5 +116,3 @@ Changelog
 
 ##### 2.0.2 (2021-06-24)
 * Added "Provide us a coffee" and "Settings" by default.
-
-
