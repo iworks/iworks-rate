@@ -40,6 +40,9 @@ do_action(
 Changelog
 ---------
 
+##### 2.3.1 (2025-05-29)
+* Added: Missing textdomain has been added.
+
 ##### 2.3.0 (2025-05-20)
 * Added: Anniversary notification system to celebrate plugin usage milestones. [#1](https://github.com/iworks/rate/issues/1)
 * Added: New template system for anniversary messages with first-year and subsequent year variations.
