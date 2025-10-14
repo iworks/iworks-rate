@@ -3,7 +3,7 @@ defined( 'ABSPATH' ) || exit; // Exit if accessed directly
 /**
  * iWorks_Rate - Dashboard Notification module.
  *
- * @version 2.3.1
+ * @version 2.3.2
  * @author  iworks (Marcin Pietrzak)
  *
  */
@@ -16,7 +16,7 @@ if ( ! class_exists( 'iworks_rate' ) ) {
 		 * @since 1.0.1
 		 * @var   string
 		 */
-		private $version = '2.3.1';
+		private $version = '2.3.2';
 
 		/**
 		 * $wpdb->options field name.
@@ -364,7 +364,17 @@ if ( ! class_exists( 'iworks_rate' ) ) {
 			if ( ! isset( $this->stored[ $plugin_id ] ) ) {
 				return;
 			}
-			++$this->stored[ $plugin_id ]['last_anniversary'];
+			/**
+			 * set proper anniversary value
+			 *
+			 * @since 2.3.2
+			 */
+			$max   = floor( $this->stored[ $plugin_id ]['last_anniversary_days'] / 365 ) + 1;
+			$value = $this->stored[ $plugin_id ]['last_anniversary'] + 1;
+			$this->stored[ $plugin_id ]['last_anniversary'] = max( $max, $value );
+			/**
+			 * save data
+			 */
 			$this->store_data();
 		}
 

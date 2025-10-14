@@ -40,6 +40,9 @@ do_action(
 Changelog
 ---------
 
+##### 2.3.2 (2025-10-14)
+* Bugfix: Anniversary value was not updated correctly. Props for [Paweł Patyk](https://wordpress.org/support/users/paulmike/).
+
 ##### 2.3.1 (2025-05-29)
 * Added: Missing textdomain has been added.
 
