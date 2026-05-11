@@ -321,7 +321,7 @@ if ( ! class_exists( 'iworks_rate' ) ) {
 			/**
 			 * get plugin ID
 			 */
-			$nonce_value = sanitize_text_field( filter_input( INPUT_POST, '_wpnonce', FILTER_DEFAULT ) );
+			$nonce_value = sanitize_text_field( wp_unslash( filter_input( INPUT_POST, '_wpnonce', FILTER_DEFAULT ) ) );
 			if ( ! wp_verify_nonce( $nonce_value, 'iworks-rate' ) ) {
 				wp_send_json_error();
 			}
