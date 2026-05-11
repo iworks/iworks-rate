@@ -797,7 +797,7 @@ if ( ! class_exists( 'iworks_rate' ) ) {
 		public function filter_get_advertising_og( $data ) {
 			return array(
 				'iworks-adverting-og' => array(
-					'title'    => __( 'OpenGraph', 'IWORKS_RATE_TEXTDOMAIN' ),
+					'title'    => esc_html__( 'OpenGraph', 'IWORKS_RATE_TEXTDOMAIN' ),
 					'callback' => array( $this, 'get_advertising_og_content' ),
 					'context'  => 'side',
 					'priority' => 'low',
@@ -813,8 +813,8 @@ if ( ! class_exists( 'iworks_rate' ) ) {
 		public function get_advertising_og_content() {
 			$args = array(
 				'install_plugin_url' => $this->get_install_plugin_url( 'og' ),
-				'plugin_name'        => __( 'OG — Better Share on Social Media', 'IWORKS_RATE_TEXTDOMAIN' ),
-				'plugin_wp_home'     => __( 'https://wordpress.org/plugins/og/', 'IWORKS_RATE_TEXTDOMAIN' ),
+				'plugin_name'        => esc_html__( 'OG — Better Share on Social Media', 'IWORKS_RATE_TEXTDOMAIN' ),
+				'plugin_wp_home'     => esc_url( __( 'https://wordpress.org/plugins/og/', 'IWORKS_RATE_TEXTDOMAIN' ) ),
 			);
 			$file = $this->get_file( 'og', 'plugins' );
 			load_template( $file, true, $args );

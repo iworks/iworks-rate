@@ -26,7 +26,7 @@ include_once 'vendor/iworks/rate/rate.php';
 do_action(
 	'iworks-register-plugin',
     /* plugin ID    */ plugin_basename( __FILE__ ),
-    /* Plugin Title */ __( 'iWorks PWA', 'iworks-pwa' ),
+    /* Plugin Title */ esc_html__( 'iWorks PWA', 'iworks-pwa' ),
     /* Plugin slug  */ 'iworks-pwa'
 );
 // All done!

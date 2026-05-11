@@ -18,7 +18,7 @@ echo wp_kses_post(
 echo '</p>';
 echo '<p class="iworks-rate-center">';
 ?>
-<a href="<?php echo esc_url( $args['support_url'] ); ?>" target="_blank" class="iworks-rate-button iworks-rate-button--blue" ><?php echo esc_html( __( 'Get help', 'IWORKS_RATE_TEXTDOMAIN' ) ); ?></a>
+<a href="<?php echo esc_url( $args['support_url'] ); ?>" target="_blank" class="iworks-rate-button iworks-rate-button--blue" ><?php echo esc_html__( 'Get help', 'IWORKS_RATE_TEXTDOMAIN' ); ?></a>
 <?php
 echo '</p>';
 echo '<p>';
@@ -28,5 +28,5 @@ echo wp_kses_post(
 echo '</p>';
 echo '<p class="iworks-rate-center">';
 ?>
-<a href="<?php echo esc_url( add_query_arg( 'rate', '5', $args['support_url'] . '/reviews/' ) ); ?>#new-post" target="_blank" class="iworks-rate-button iworks-rate-button--blue" ><?php echo esc_html( __( 'Add review', 'IWORKS_RATE_TEXTDOMAIN' ) ); ?></a>
+<a href="<?php echo esc_url( add_query_arg( 'rate', '5', $args['support_url'] . '/reviews/' ) ); ?>#new-post" target="_blank" class="iworks-rate-button iworks-rate-button--blue" ><?php echo esc_html__( 'Add review', 'IWORKS_RATE_TEXTDOMAIN' ); ?></a>
 </p>

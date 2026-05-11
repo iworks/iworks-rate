@@ -20,7 +20,7 @@ defined( 'ABSPATH' ) || exit; // Exit if accessed directly
 			<?php
 			printf(
 			/* translators: %s is a plugin name wrapped by strong html tag */
-				esc_html( __( 'Thank you for using our plugin %s!', 'IWORKS_RATE_TEXTDOMAIN' ) ),
+				esc_html__( 'Thank you for using our plugin %s!', 'IWORKS_RATE_TEXTDOMAIN' ),
 				/* translators: %s is a plugin name */
 				sprintf( '<strong>%s</strong>', esc_html( $args['title'] ) )
 			);
@@ -28,17 +28,17 @@ defined( 'ABSPATH' ) || exit; // Exit if accessed directly
 			</span></h4>
 <?php
 /* translators: %1$s: open anchor tag, %2$s: close anchor tag */
-$content = __( 'Please let us know what you think about our plugin. It is important that we can develop this tool. Thank you for all the ratings, reviews and donates. If you have a technical problem, please before you add a review %1$scheck our FAQ%2$s or contact us if you did not find help there. We will try to help you!', 'IWORKS_RATE_TEXTDOMAIN' );
+$content = esc_html__( 'Please let us know what you think about our plugin. It is important that we can develop this tool. Thank you for all the ratings, reviews and donates. If you have a technical problem, please before you add a review %1$scheck our FAQ%2$s or contact us if you did not find help there. We will try to help you!', 'IWORKS_RATE_TEXTDOMAIN' );
 echo wp_kses_post( wpautop( sprintf( $content, sprintf( '<a href="%s#faq" target="_blank">', esc_url( $args['url'] ) ), '</a>' ) ) );
 ?>
 		<div class="iworks-rate-buttons">
-			<a data-action="get-help" href="<?php echo esc_url( $args['support_url'] ); ?>/#new-post" target="_blank" class="iworks-rate-button iworks-rate-button--green" ><?php echo esc_html( __( 'Get help', 'IWORKS_RATE_TEXTDOMAIN' ) ); ?></a>
+			<a data-action="get-help" href="<?php echo esc_url( $args['support_url'] ); ?>/#new-post" target="_blank" class="iworks-rate-button iworks-rate-button--green" ><?php echo esc_html__( 'Get help', 'IWORKS_RATE_TEXTDOMAIN' ); ?></a>
 <?php if ( intval( $args['rated'] ) === 0 ) { ?>
-			<a data-action="add-review" href="<?php echo esc_url( $args['support_url'] ); ?>/reviews/?rate=5#new-post" target="_blank" class="iworks-rate-button iworks-rate-button--green" ><?php echo esc_html( __( 'Add review', 'IWORKS_RATE_TEXTDOMAIN' ) ); ?></a>
+			<a data-action="add-review" href="<?php echo esc_url( $args['support_url'] ); ?>/reviews/?rate=5#new-post" target="_blank" class="iworks-rate-button iworks-rate-button--green" ><?php echo esc_html__( 'Add review', 'IWORKS_RATE_TEXTDOMAIN' ); ?></a>
 <?php } ?>
-			<a data-action="donate" href="https://ko-fi.com/iworks/?utm_source=<?php echo esc_url( $args['slug'] ); ?>&utm_medium=notice-thanks" target="_blank" class="iworks-rate-button iworks-rate-button--green dashicons-heart" ><?php echo esc_html( __( 'Provide us a coffee', 'IWORKS_RATE_TEXTDOMAIN' ) ); ?></a>
+			<a data-action="donate" href="https://ko-fi.com/iworks/?utm_source=<?php echo esc_url( $args['slug'] ); ?>&utm_medium=notice-thanks" target="_blank" class="iworks-rate-button iworks-rate-button--green dashicons-heart" ><?php echo esc_html__( 'Provide us a coffee', 'IWORKS_RATE_TEXTDOMAIN' ); ?></a>
 <?php if ( intval( $args['rated'] ) === 0 ) { ?>
-			<button type="button" data-action="hide" class="iworks-rate-button iworks-rate-button--blue" ><?php echo esc_html( __( 'I added review, do not show again', 'IWORKS_RATE_TEXTDOMAIN' ) ); ?></button>
+			<button type="button" data-action="hide" class="iworks-rate-button iworks-rate-button--blue" ><?php echo esc_html__( 'I added review, do not show again', 'IWORKS_RATE_TEXTDOMAIN' ); ?></button>
 <?php } ?>
 		</div>
 	</div>
